@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.GridPane?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            minHeight="550.0" minWidth="850.0"
+            fx:controller="agh.ics.oop.presenter.SimulationPresenter">
+    <center>
+        <Label fx:id="infoLabel" text="All animals will be living here!" textAlignment="CENTER"/>
+        <GridPane fx:id="mapGrid" gridLinesVisible="true" alignment="CENTER"/>
+    </center>
+
+    <bottom>
+        <VBox>
+            <TextField fx:id="inputField" promptText="moves"/>
+            <Label fx:id="description" text="moves list"/>
+            <Button fx:id="startButton" text="Start" onAction="#onSimulationStartClicked"/>
+        </VBox>
+    </bottom>
+
+
+</BorderPane>
