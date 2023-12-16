@@ -50,9 +50,13 @@ public class Animal implements WorldElement{
         return switch (this.currentOrientation)
         {
             case NORTH -> "^";
+            case NORTH_EAST -> "NE";
             case EAST ->  ">";
+            case SOUTH_EAST -> "SE";
             case SOUTH -> "v";
+            case SHOUT_WEST -> "SW";
             case WEST -> "<";
+            case NORTH_WEST -> "NW";
         };
     }
 

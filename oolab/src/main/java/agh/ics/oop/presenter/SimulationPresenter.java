@@ -9,6 +9,9 @@ import javafx.geometry.HPos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -64,15 +67,22 @@ public class SimulationPresenter implements MapChangeListener {
 
         for (int y = numRows; y > 0; y--) {
             for (int x = 1; x <= numCols; x++) {
-                Label element = new Label();
-                Vector2d currPosition = new Vector2d(x - 1 + bounds.leftDown().getX(), y - 1 + bounds.leftDown().getY());
+                Rectangle komorka = new Rectangle(CELL_SIZE, CELL_SIZE);
+                komorka.setStroke(Color.BLACK);
+                Vector2d aktualnaPozycja = new Vector2d(x - 1 + bounds.leftDown().getX(), y - 1 + bounds.leftDown().getY());
 
-                if (worldMap.objectAt(currPosition) != null) {
-                    element.setText(worldMap.objectAt(currPosition).toString());
+                // Ustawianie kolorów na podstawie typu obiektu na danej pozycji
+                Object obiekt = worldMap.objectAt(aktualnaPozycja);
+                if (obiekt instanceof Grass) {
+                    komorka.setFill(Color.GREEN);
+                } else if (obiekt instanceof Animal) {
+                    komorka.setFill(Color.YELLOW);
+                } else {
+                    komorka.setFill(Color.WHITE); // Domyślny kolor dla innych obiektów
                 }
 
-                GridPane.setHalignment(element, HPos.CENTER);
-                mapGrid.add(element, x, numRows - y + 1);
+                GridPane.setHalignment(komorka, HPos.CENTER);
+                mapGrid.add(komorka, x, numRows - y + 1);
             }
         }
 
