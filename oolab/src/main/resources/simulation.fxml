@@ -20,6 +20,8 @@
             <TextField fx:id="inputField" promptText="moves"/>
             <Label fx:id="description" text="moves list"/>
             <Button fx:id="startButton" text="Start" onAction="#onSimulationStartClicked"/>
+            <Button fx:id="pauseButton" text="Pause" onAction="#onPauseSimulation"/>
+            <Button fx:id="resetButton" text="Reset" onAction="#onResumeSimulation"/>
         </VBox>
     </bottom>
 

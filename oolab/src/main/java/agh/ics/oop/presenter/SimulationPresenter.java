@@ -24,6 +24,8 @@ public class SimulationPresenter implements MapChangeListener {
     @FXML
     private TextField inputField;
     private static final int CELL_SIZE = 40;
+
+    private SimulationEngine simulationEngine;
     public void setWorldMap(WorldMap worldMap) {
         this.worldMap = worldMap;
     }
@@ -74,11 +76,11 @@ public class SimulationPresenter implements MapChangeListener {
                 // Ustawianie kolorów na podstawie typu obiektu na danej pozycji
                 Object obiekt = worldMap.objectAt(aktualnaPozycja);
                 if (obiekt instanceof Grass) {
-                    komorka.setFill(Color.GREEN);
+                    komorka.setFill(Color.RED);
                 } else if (obiekt instanceof Animal) {
                     komorka.setFill(Color.YELLOW);
                 } else {
-                    komorka.setFill(Color.WHITE); // Domyślny kolor dla innych obiektów
+                    komorka.setFill(Color.GREEN); // Domyślny kolor dla innych obiektów
                 }
 
                 GridPane.setHalignment(komorka, HPos.CENTER);
@@ -105,7 +107,21 @@ public class SimulationPresenter implements MapChangeListener {
 
         setWorldMap(worldMap);
         SimulationEngine simulationEngine = new SimulationEngine(Arrays.asList(simulation),4);
+        this.simulationEngine = simulationEngine;
         simulationEngine.runAsyncInThreadPool();
 
     }
+
+    public void onPauseSimulation() {
+        if (simulationEngine != null) {
+            simulationEngine.stopAllSimulations();
+        }
+    }
+
+    public void onResumeSimulation() {
+        if (simulationEngine != null) {
+            simulationEngine.resumeAllSimulations();
+        }
+    }
+
 }

@@ -61,5 +61,19 @@ public class SimulationEngine {
         }
     }
 
+    // Dodanie metody do zatrzymywania wszystkich symulacji
+    public void stopAllSimulations() {
+        for (Simulation simulation : simulations) {
+            simulation.stopSimulation();
+        }
+    }
+
+    // Dodanie metody do wznowienia wszystkich symulacji
+    public void resumeAllSimulations() {
+        for (Simulation simulation : simulations) {
+            simulation.resumeSimulation();
+        }
+    }
+
 
 }

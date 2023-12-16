@@ -16,6 +16,8 @@ public class Simulation implements Runnable{
 
     private WorldMap map;
 
+    private volatile boolean isPaused = false; // Flaga do zatrzymywania/wznawiania symulacji
+
 
     public Simulation(List<Vector2d> initialPositions, List<MoveDirection> directions, WorldMap map){
         List<Animal> animals = new ArrayList<>();
@@ -33,26 +35,37 @@ public class Simulation implements Runnable{
         this.map = map;
     }
 
+
     List<Animal> getAnimals() {
         return Collections.unmodifiableList(animals);
     }
 
     public void run(){
         int sizeOfAnimals = this.animals.size();
-        int sizeOfDiresctions = this.moveDirections.size();
+        int sizeOfDirections = this.moveDirections.size();
+        int iterator = 0;
+        while (iterator < sizeOfDirections) {
+            if (!isPaused) {
+                MoveDirection direction = moveDirections.get(iterator);
+                Animal currAnimal = animals.get(iterator % sizeOfAnimals);
 
-        for(int i = 0; i < sizeOfDiresctions; i++)
-        {
-            MoveDirection direction = moveDirections.get(i);
-            Animal currAnimal = animals.get(i%sizeOfAnimals);
+                map.move(currAnimal, direction);
 
-            map.move(currAnimal,direction);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                iterator++;
             }
         }
+    }
+    public void stopSimulation() {
+        isPaused = true;
+    }
+
+    public void resumeSimulation() {
+        isPaused = false;
     }
 
 }
