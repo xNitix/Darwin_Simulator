@@ -17,15 +17,46 @@
         <GridPane fx:id="mapGrid" gridLinesVisible="true" alignment="CENTER"/>
     </center>
 
-    <bottom>
+    <left>
         <VBox>
+            <Label text="Amnimal number:"/>
+            <TextField fx:id="animalNumber" promptText="Enter animal number"/>
+
             <Spinner fx:id="genNumber" promptText="Length of genotype"/>
             <Label fx:id="description" text="moves list"/>
+
+            <Label text="Start Energy:"/>
+            <TextField fx:id="startEnergyField" promptText="Enter start energy"/>
+
+            <Label text="Map width:"/>
+            <TextField fx:id="widthField" promptText="Enter width"/>
+
+            <Label text="Map height:"/>
+            <TextField fx:id="heightField" promptText="Enter height"/>
+
+            <Label text="Start grass quantity:"/>
+            <TextField fx:id="grassQuantityField" promptText="Enter grass quantity"/>
+
+            <Label text="Energy from plant"/>
+            <TextField fx:id="energyEat" promptText="Enter energy for eating the plant"/>
+
+            <Label text="Move cost energy"/>
+            <TextField fx:id="moveEnergyCost" promptText="Enter energy cost for move"/>
+
+            <Label text="New plant per day"/>
+            <TextField fx:id="plantPerDay" promptText="Enter how many plants should appear every day"/>
+
+            <Label text="Number of mutations"/>
+            <TextField fx:id="mutationsNumber" promptText="Enter Number of mutations"/>
+
+
+
+
             <Button fx:id="startButton" text="Start" onAction="#onSimulationStartClicked"/>
             <Button fx:id="pauseButton" text="Pause" onAction="#onPauseSimulation"/>
             <Button fx:id="resetButton" text="Reset" onAction="#onResumeSimulation"/>
         </VBox>
-    </bottom>
+    </left>
 
 
 </BorderPane>

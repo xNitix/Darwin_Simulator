@@ -12,14 +12,17 @@ public class Simulation implements Runnable{
 
     private WorldMap map;
 
+    private final int energyCost;
+
     private volatile boolean isPaused = false; // Flaga do zatrzymywania/wznawiania symulacji
 
 
-    public Simulation(List<Vector2d> initialPositions, WorldMap map, int genNumber){
+    public Simulation(List<Vector2d> initialPositions, WorldMap map, int genNumber, int startEnergy, int energyCost){
         List<Animal> animals = new ArrayList<>();
+        this.energyCost = energyCost;
         for(Vector2d position : initialPositions){
             int[] genes = GenoType.createRandomGenoType(genNumber);
-            Animal currAnimal = new Animal(position,genes);
+            Animal currAnimal = new Animal(position,genes,startEnergy);
            try{
                map.place(currAnimal);
                animals.add(currAnimal);
@@ -38,6 +41,21 @@ public class Simulation implements Runnable{
     }
 
     public void run(){
+        while(true) {
+            if (!isPaused) {
+                updateAnimals();
+                try {
+                    Thread.sleep(1000); // Opóźnienie 1 sekunda między kolejnymi aktualizacjami
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+    }
+
+    private void updateAnimals(){
+        /*
         int sizeOfAnimals = this.animals.size();
         int iterator = 0;
         while (true) {
@@ -54,6 +72,13 @@ public class Simulation implements Runnable{
                 iterator++;
             }
         }
+
+         */
+
+        for(Animal animal : animals){
+            map.move(animal,-energyCost);
+        }
+
     }
     public void stopSimulation() {
         isPaused = true;

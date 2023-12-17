@@ -9,7 +9,6 @@ public class GenoType {
         for(int i = 0; i < genNumber; i++){
             genotype[i] = (int) ((Math.random()*TYPES_OF_GENES ));
         }
-        Arrays.sort(genotype);
         return genotype;
     }
 }

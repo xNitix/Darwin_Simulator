@@ -5,12 +5,21 @@ public class Animal implements WorldElement{
     private Vector2d position;
     private final int[] genoType;
     private int wchichGen = 0;
+    private final int startEnergy;
 
-    public Animal(Vector2d position, int[] genoType)
+    public int getCurrentEnergy() {
+        return currentEnergy;
+    }
+
+    private int currentEnergy;
+
+    public Animal(Vector2d position, int[] genoType, int currentEnergy)
     {
         this.position = position;
         this.currentOrientation = MapDirection.NORTH;
         this.genoType = genoType;
+        this.currentEnergy = currentEnergy;
+        this.startEnergy = currentEnergy;
     }
 
 
@@ -26,11 +35,12 @@ public class Animal implements WorldElement{
         return this.position.equals(position);
     }
 
-    public void move(){
+    public void move(int eneryCost){
         int newDirectionId = (currentOrientation.directionToId() + genoType[wchichGen%genoType.length])%8;
         currentOrientation = currentOrientation.idToDirection(newDirectionId);
         Vector2d newPosition = this.position.add(currentOrientation.toUnitVector());
         this.position = newPosition;
+        currentEnergy += eneryCost;
         wchichGen++;
         /*
             if(validator.canMoveTo(newPosition)){
