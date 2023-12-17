@@ -14,8 +14,10 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class SimulationPresenter implements MapChangeListener {
     @FXML
@@ -44,6 +46,7 @@ public class SimulationPresenter implements MapChangeListener {
     private int cellSize = 280;
     private int startEnergy;
     private int moveCost;
+    private int startAnimalNumber;
 
     private SimulationEngine simulationEngine;
     public void setWorldMap(WorldMap worldMap) {
@@ -137,6 +140,7 @@ public class SimulationPresenter implements MapChangeListener {
             int grassQuantity = Integer.parseInt(grassQuantityField.getText());
             startEnergy = Integer.parseInt(startEnergyField.getText());
             moveCost = Integer.parseInt(moveEnergyCost.getText());
+            startAnimalNumber = Integer.parseInt(animalNumber.getText());
             cellSize=cellSize/width;
 
             if (width <= 0 || height <= 0 || grassQuantity < 0 || startEnergy < 0) {
@@ -151,7 +155,7 @@ public class SimulationPresenter implements MapChangeListener {
         }
 
 
-        List<Vector2d> positions = List.of(new Vector2d(2,2), new Vector2d(5,4));
+        List<Vector2d> positions = generateStartPositions();
         Simulation simulation = new Simulation(positions, worldMap, (Integer) genNumber.getValue(), startEnergy, moveCost);
 
         setWorldMap(worldMap);
@@ -176,6 +180,24 @@ public class SimulationPresenter implements MapChangeListener {
     public void initialize() {
         // Ustawienie wartości domyślnej dla Spinnera genNumber
         genNumber.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 5)); // zakres od 0 do oo, wartość domyślna 5
+    }
+
+    private List<Vector2d> generateStartPositions(){
+        List<Vector2d> positions = new ArrayList<>();
+        Random random = new Random();
+
+        Boundary bounds = worldMap.getCurrentBounds();
+        int width = bounds.rightUp().getX() - bounds.leftDown().getX() + 1;
+        int height = bounds.rightUp().getY() - bounds.leftDown().getY() + 1;
+
+        for (int i = 0; i < startAnimalNumber; i++) {
+            int x = random.nextInt(width) + bounds.leftDown().getX();
+            int y = random.nextInt(height) + bounds.leftDown().getY();
+            positions.add(new Vector2d(x, y));
+        }
+
+        return positions;
+
     }
 
 }
