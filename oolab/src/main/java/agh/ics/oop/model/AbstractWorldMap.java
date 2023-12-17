@@ -14,9 +14,9 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     protected final UUID id = UUID.randomUUID();
 
-    public void move(Animal animal, MoveDirection direction) {
+    public void move(Animal animal) {
         Vector2d oldPosition = animal.getPosition();
-        animal.move(direction, this);
+        animal.move();
         if (!oldPosition.equals(animal.getPosition())) {
             animals.remove(oldPosition);
             animals.put(animal.getPosition(), animal);

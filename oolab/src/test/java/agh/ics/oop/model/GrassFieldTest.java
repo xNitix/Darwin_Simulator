@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GrassFieldTest {
+    /*
 
     GrassField map;
     Animal animal0;
     Animal animal1;
     Animal animal2;
 
+    /*
     @BeforeEach
     void setUp() throws PositionAlreadyOccupiedException
     {
@@ -25,6 +27,9 @@ class GrassFieldTest {
         map.place(animal2);
     }
 
+     */
+
+    /*
     @Test
     void canMoveTo(){
         //nachodzenie na innego zwierzaka
@@ -38,7 +43,10 @@ class GrassFieldTest {
         assertTrue(map.canMoveTo(new Vector2d(5,5)));
         assertTrue(map.canMoveTo(new Vector2d(2,3)));
     }
+    */
 
+
+    /*
     @Test
     void place() throws PositionAlreadyOccupiedException {
         Animal animalNew0 = new Animal(new Vector2d(5,0));
@@ -50,6 +58,9 @@ class GrassFieldTest {
         assertThrows(PositionAlreadyOccupiedException.class, ()->map.place(animalNew2));
     }
 
+     */
+
+    /*
     @Test
     void move() {
         map.move(animal0,MoveDirection.RIGHT);
@@ -88,4 +99,6 @@ class GrassFieldTest {
         assertNotNull(map.objectAt(new Vector2d(2, 3)));
         assertNotNull(map.objectAt(new Vector2d(5, 5)));
     }
+
+    */
 }

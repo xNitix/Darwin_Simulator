@@ -3,16 +3,14 @@ package agh.ics.oop.model;
 public class Animal implements WorldElement{
     private MapDirection currentOrientation;
     private Vector2d position;
-    public Animal()
-    {
-        this.position = new Vector2d(2,2);
-        this.currentOrientation =  MapDirection.NORTH;
-    }
+    private final int[] genoType;
+    private int wchichGen = 0;
 
-    public Animal(Vector2d position)
+    public Animal(Vector2d position, int[] genoType)
     {
         this.position = position;
         this.currentOrientation = MapDirection.NORTH;
+        this.genoType = genoType;
     }
 
 
@@ -28,23 +26,20 @@ public class Animal implements WorldElement{
         return this.position.equals(position);
     }
 
-    public void move(MoveDirection direction, MoveValidator validator){
-        if(direction == MoveDirection.RIGHT){
-            currentOrientation = currentOrientation.next();
-        }else if(direction == MoveDirection.LEFT){
-            currentOrientation = currentOrientation.previous();
-        }else if(direction == MoveDirection.FORWARD){
-            Vector2d newPosition = this.position.add(currentOrientation.toUnitVector());
+    public void move(){
+        int newDirectionId = (currentOrientation.directionToId() + genoType[wchichGen%genoType.length])%8;
+        currentOrientation = currentOrientation.idToDirection(newDirectionId);
+        Vector2d newPosition = this.position.add(currentOrientation.toUnitVector());
+        this.position = newPosition;
+        wchichGen++;
+        /*
             if(validator.canMoveTo(newPosition)){
                 this.position = newPosition;
             }
-        } else if (direction == MoveDirection.BACKWARD) {
-            Vector2d newPosition = this.position.subtract(currentOrientation.toUnitVector());
-            if(validator.canMoveTo(newPosition)){
-                this.position = newPosition;
-            }
-        }
+
+         */
     }
+
 
     public String toString() {
         return switch (this.currentOrientation)

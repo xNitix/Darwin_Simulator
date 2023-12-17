@@ -53,20 +53,37 @@ public enum MapDirection {
         };
     }
 
-    /* sprawdzenie czy dzialaja
-    public static void main(String[] args)
+    public int directionToId()
     {
-        for(MapDirection direction : MapDirection.values())
+        return switch(this)
         {
-            System.out.println(direction.toString());
-            System.out.print(direction);
-            System.out.print(direction.previous());
-            System.out.println(direction.next());
-            System.out.println(direction.toUnitVector());
-        }
-
+            case NORTH -> 0;
+            case NORTH_EAST -> 1;
+            case EAST -> 2;
+            case SOUTH_EAST -> 3;
+            case SOUTH -> 4;
+            case SHOUT_WEST -> 5;
+            case WEST -> 6;
+            case NORTH_WEST -> 7;
+        };
     }
 
-     */
+    public MapDirection idToDirection(int directionId)
+    {
+        return switch(directionId)
+        {
+            case 0 -> NORTH;
+            case 1 -> NORTH_EAST;
+            case 2 -> EAST;
+            case 3 -> SOUTH_EAST;
+            case 4 -> SOUTH;
+            case 5 -> SHOUT_WEST;
+            case 6 -> WEST;
+            case 7 -> NORTH_WEST;
+            default -> throw new IllegalStateException("Unexpected value: " + directionId);
+        };
+    }
+
+
 
 }

@@ -1,10 +1,7 @@
 package agh.ics.oop;
 
-import agh.ics.oop.model.Animal;
+import agh.ics.oop.model.*;
 import agh.ics.oop.model.Exceptions.PositionAlreadyOccupiedException;
-import agh.ics.oop.model.MoveDirection;
-import agh.ics.oop.model.Vector2d;
-import agh.ics.oop.model.WorldMap;
 
 import java.util.ArrayList;
 import java.util.*;
@@ -12,26 +9,26 @@ import java.util.*;
 public class Simulation implements Runnable{
 
     private List<Animal> animals;
-    private List<MoveDirection> moveDirections;
 
     private WorldMap map;
 
     private volatile boolean isPaused = false; // Flaga do zatrzymywania/wznawiania symulacji
 
 
-    public Simulation(List<Vector2d> initialPositions, List<MoveDirection> directions, WorldMap map){
+    public Simulation(List<Vector2d> initialPositions, WorldMap map, int genNumber){
         List<Animal> animals = new ArrayList<>();
         for(Vector2d position : initialPositions){
-            Animal currAnimal = new Animal(position);
+            int[] genes = GenoType.createRandomGenoType(genNumber);
+            Animal currAnimal = new Animal(position,genes);
            try{
                map.place(currAnimal);
                animals.add(currAnimal);
+
            }catch(PositionAlreadyOccupiedException e){
                System.out.println(e.getMessage());
            }
         }
         this.animals = animals;
-        this.moveDirections = directions;
         this.map = map;
     }
 
@@ -42,14 +39,12 @@ public class Simulation implements Runnable{
 
     public void run(){
         int sizeOfAnimals = this.animals.size();
-        int sizeOfDirections = this.moveDirections.size();
         int iterator = 0;
-        while (iterator < sizeOfDirections) {
+        while (true) {
             if (!isPaused) {
-                MoveDirection direction = moveDirections.get(iterator);
                 Animal currAnimal = animals.get(iterator % sizeOfAnimals);
 
-                map.move(currAnimal, direction);
+                map.move(currAnimal);
 
                 try {
                     Thread.sleep(1000);

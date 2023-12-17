@@ -6,6 +6,8 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.GridPane?>
 
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Spinner?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             minHeight="550.0" minWidth="850.0"
@@ -17,7 +19,7 @@
 
     <bottom>
         <VBox>
-            <TextField fx:id="inputField" promptText="moves"/>
+            <Spinner fx:id="genNumber" promptText="Length of genotype"/>
             <Label fx:id="description" text="moves list"/>
             <Button fx:id="startButton" text="Start" onAction="#onSimulationStartClicked"/>
             <Button fx:id="pauseButton" text="Pause" onAction="#onPauseSimulation"/>

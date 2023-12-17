@@ -7,6 +7,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -16,6 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SimulationPresenter implements MapChangeListener {
+    @FXML
+    private Spinner genNumber;
     @FXML
     private Label description;
     @FXML
@@ -99,11 +103,8 @@ public class SimulationPresenter implements MapChangeListener {
     }
 
     public void onSimulationStartClicked(ActionEvent actionEvent) {
-        String[] args = inputField.getText().split(" ");
-        List<MoveDirection> directions = OptionsParser.parse(args);
-
         List<Vector2d> positions = List.of(new Vector2d(2,2), new Vector2d(5,4));
-        Simulation simulation = new Simulation(positions, directions, worldMap);
+        Simulation simulation = new Simulation(positions, worldMap, (Integer) genNumber.getValue());
 
         setWorldMap(worldMap);
         SimulationEngine simulationEngine = new SimulationEngine(Arrays.asList(simulation),4);
@@ -122,6 +123,11 @@ public class SimulationPresenter implements MapChangeListener {
         if (simulationEngine != null) {
             simulationEngine.resumeAllSimulations();
         }
+    }
+
+    public void initialize() {
+        // Ustawienie wartości domyślnej dla Spinnera genNumber
+        genNumber.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 5)); // zakres od 0 do oo, wartość domyślna 5
     }
 
 }
