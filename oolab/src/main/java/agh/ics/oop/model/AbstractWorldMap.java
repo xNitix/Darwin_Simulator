@@ -14,17 +14,8 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     protected final UUID id = UUID.randomUUID();
 
-    public void move(Animal animal, int energyCost) {
-        Vector2d oldPosition = animal.getPosition();
-        animal.move(energyCost);
-        if (!oldPosition.equals(animal.getPosition())) {
-            animals.remove(oldPosition);
-            animals.put(animal.getPosition(), animal);
-            mapChanged("animal moved from : " + oldPosition + " to : " + animal.getPosition());
-        }else{
-            mapChanged("animal in position: " + oldPosition + " changed its orientation to: " + animal.getCurrentOrientation());
-        }
-    }
+
+
 
     public void subscribe(MapChangeListener listener)
     {
@@ -43,19 +34,20 @@ public abstract class AbstractWorldMap implements WorldMap {
     }
 
     public void place(Animal animal) throws PositionAlreadyOccupiedException {
-        if (canMoveTo(animal.getPosition())) {
-            animals.put(animal.getPosition(), animal);
-            mapChanged("animal placed : " + animal.getPosition());
-        } else {
-            throw new PositionAlreadyOccupiedException(animal.getPosition());
-        }
+        //if (canMoveTo(animal.getPosition())) {
+        animals.put(animal.getPosition(), animal);
+        mapChanged("animal placed : " + animal.getPosition());
+        //} else {
+        //    throw new PositionAlreadyOccupiedException(animal.getPosition());
+        //}
 
     }
 
+    /*
     public boolean canMoveTo(Vector2d position) {
         return !animals.containsKey(position);
     }
-
+    */
     public boolean isOccupied(Vector2d position) {
         return animals.containsKey((position));
     }

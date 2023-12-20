@@ -37,13 +37,13 @@
             <TextField fx:id="grassQuantityField" promptText="Enter grass quantity"/>
 
             <Label text="Energy from plant"/>
-            <TextField fx:id="energyEat" promptText="Enter energy for eating the plant"/>
+            <TextField fx:id="energyEatField" promptText="Enter energy for eating the plant"/>
 
             <Label text="Move cost energy"/>
             <TextField fx:id="moveEnergyCost" promptText="Enter energy cost for move"/>
 
             <Label text="New plant per day"/>
-            <TextField fx:id="plantPerDay" promptText="Enter how many plants should appear every day"/>
+            <TextField fx:id="plantPerDayField" promptText="Enter how many plants should appear every day"/>
 
             <Label text="Number of mutations"/>
             <TextField fx:id="mutationsNumber" promptText="Enter Number of mutations"/>

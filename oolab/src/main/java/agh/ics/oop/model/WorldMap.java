@@ -50,4 +50,8 @@ public interface WorldMap extends MoveValidator {
     Boundary getCurrentBounds();
 
     UUID getID();
+
+    FieldType getFieldType(Vector2d position);
+
+    void makeGrassMap(int quantity);
 }

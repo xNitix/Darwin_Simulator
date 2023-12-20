@@ -84,6 +84,9 @@ public enum MapDirection {
         };
     }
 
+    public MapDirection getReverse(int directionId){
+        return idToDirection((directionId+4) % 8);
+    }
 
 
 }

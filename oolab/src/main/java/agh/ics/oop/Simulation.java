@@ -14,15 +14,18 @@ public class Simulation implements Runnable{
 
     private final int energyCost;
 
+    private final int plantPerDay;
+
     private volatile boolean isPaused = false; // Flaga do zatrzymywania/wznawiania symulacji
 
 
-    public Simulation(List<Vector2d> initialPositions, WorldMap map, int genNumber, int startEnergy, int energyCost){
+    public Simulation(List<Vector2d> initialPositions, WorldMap map, int genNumber, int startEnergy, int energyCost, int plantPerDay){
         List<Animal> animals = new ArrayList<>();
         this.energyCost = energyCost;
+        this.plantPerDay = plantPerDay;
         for(Vector2d position : initialPositions){
             int[] genes = GenoType.createRandomGenoType(genNumber);
-            Animal currAnimal = new Animal(position,genes,startEnergy);
+            Animal currAnimal = new Animal(position,genes,startEnergy,map);
            try{
                map.place(currAnimal);
                animals.add(currAnimal);
@@ -44,6 +47,7 @@ public class Simulation implements Runnable{
         while(true) {
             if (!isPaused) {
                 updateAnimals();
+                map.makeGrassMap(plantPerDay);
                 try {
                     Thread.sleep(1000); // Opóźnienie 1 sekunda między kolejnymi aktualizacjami
                 } catch (InterruptedException e) {

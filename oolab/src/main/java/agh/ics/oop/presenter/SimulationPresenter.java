@@ -23,9 +23,9 @@ public class SimulationPresenter implements MapChangeListener {
     @FXML
     private TextField moveEnergyCost;
     @FXML
-    private TextField energyEat;
+    private TextField energyEatField;
     @FXML
-    private TextField plantPerDay;
+    private TextField plantPerDayField;
     @FXML
     private TextField startEnergyField;
     @FXML
@@ -47,6 +47,8 @@ public class SimulationPresenter implements MapChangeListener {
     private int startEnergy;
     private int moveCost;
     private int startAnimalNumber;
+
+    private int plantPerDay;
 
     private SimulationEngine simulationEngine;
     public void setWorldMap(WorldMap worldMap) {
@@ -115,7 +117,12 @@ public class SimulationPresenter implements MapChangeListener {
                         komorka.setFill(Color.YELLOW);
                     }
                 } else {
-                    komorka.setFill(Color.GREEN); // Domyślny kolor dla innych obiektów
+                    FieldType fieldType = worldMap.getFieldType(aktualnaPozycja);
+                    if(fieldType == FieldType.PREFERRED){
+                        komorka.setFill(Color.GREEN);
+                    } else {
+                        komorka.setFill(Color.BROWN);
+                    }
                 }
 
                 GridPane.setHalignment(komorka, HPos.CENTER);
@@ -141,6 +148,7 @@ public class SimulationPresenter implements MapChangeListener {
             startEnergy = Integer.parseInt(startEnergyField.getText());
             moveCost = Integer.parseInt(moveEnergyCost.getText());
             startAnimalNumber = Integer.parseInt(animalNumber.getText());
+            plantPerDay = Integer.parseInt(plantPerDayField.getText());
             cellSize=cellSize/width;
 
             if (width <= 0 || height <= 0 || grassQuantity < 0 || startEnergy < 0) {
@@ -156,7 +164,7 @@ public class SimulationPresenter implements MapChangeListener {
 
 
         List<Vector2d> positions = generateStartPositions();
-        Simulation simulation = new Simulation(positions, worldMap, (Integer) genNumber.getValue(), startEnergy, moveCost);
+        Simulation simulation = new Simulation(positions, worldMap, (Integer) genNumber.getValue(), startEnergy, moveCost, plantPerDay);
 
         setWorldMap(worldMap);
         SimulationEngine simulationEngine = new SimulationEngine(Arrays.asList(simulation),4);
@@ -195,6 +203,7 @@ public class SimulationPresenter implements MapChangeListener {
             int y = random.nextInt(height) + bounds.leftDown().getY();
             positions.add(new Vector2d(x, y));
         }
+
 
         return positions;
 
