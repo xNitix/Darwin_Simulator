@@ -4,9 +4,20 @@ import java.util.*;
 
 public class GrassField extends AbstractWorldMap{
     private final Map<Vector2d, FieldType> fieldTypes = new HashMap<>();
+
+    public Map<Vector2d, Grass> getGrasses() {
+        return grasses;
+    }
     private final Map<Vector2d,Grass> grasses = new HashMap<>();
     private final Vector2d leftDownGrass;
     private final Vector2d rightUpGrass;
+
+    public ArrayList<Grass> getGrassesObj() {
+        return grassesObj;
+    }
+
+    public ArrayList<Grass> grassesObj = new ArrayList<>();
+
 
     public GrassField(int grassFilesQuantity, int width, int height) {
         leftDownGrass = new Vector2d(0,0);
@@ -71,8 +82,8 @@ public class GrassField extends AbstractWorldMap{
 
         while(addedGrass < quantity && !isMapFullOfGrass() && (!preferredPositions.isEmpty() || !unattractivePositions.isEmpty())) {
 
-            System.out.println(preferredPositions.size());
-            System.out.println(unattractivePositions.size());
+            //System.out.println(preferredPositions.size());
+            ///System.out.println(unattractivePositions.size());
 
             double grassProbability = Math.random();
 
@@ -82,7 +93,9 @@ public class GrassField extends AbstractWorldMap{
             } else {
                 newPosition = unattractivePositions.remove(0);
             }
-            grasses.put(newPosition, new Grass(newPosition));
+            Grass newGrass = new Grass(newPosition);
+            grasses.put(newPosition, newGrass);
+            grassesObj.add(newGrass);
             addedGrass++;
         }
     }
@@ -92,13 +105,6 @@ public class GrassField extends AbstractWorldMap{
         return super.isOccupied(position) || grasses.containsKey(position);
     }
 
-    @Override
-    public WorldElement objectAt(Vector2d position) {
-        if(super.objectAt(position) != null){
-            return super.objectAt(position);
-        }
-        return grasses.getOrDefault(position,null);
-    }
     @Override
     public Collection<WorldElement> getElements() {
         Collection<WorldElement> allElements = new ArrayList<>(super.getElements());
@@ -117,15 +123,24 @@ public class GrassField extends AbstractWorldMap{
 
     public void move(Animal animal, int energyCost) {
 
-        System.out.println(Arrays.toString(animal.getGenoType()));
+       // System.out.println(Arrays.toString(animal.getGenoType()));
         MapDirection newDirection= animal.getNewDirection();
         Vector2d oldPosition = animal.getPosition();
         Vector2d newPosition = generateNewPosition(oldPosition,newDirection);
 
         animal.move(energyCost, newPosition);
         if (!oldPosition.equals(animal.getPosition())) {
-            animals.remove(oldPosition);
-            animals.put(animal.getPosition(), animal);
+            SamePositionAnimals oldPositionAnimals = animals.get(oldPosition);
+            if (oldPositionAnimals != null) {
+                oldPositionAnimals.removeAnimal(animal);
+                if (oldPositionAnimals.isEmpty()) {
+                    animals.remove(oldPosition);
+                }
+            }
+
+            SamePositionAnimals newPositionAnimals = animals.getOrDefault(animal.getPosition(), new SamePositionAnimals(animal.getPosition(), animal, this));
+            newPositionAnimals.addAnimal(animal);
+            animals.put(animal.getPosition(), newPositionAnimals);
             mapChanged("animal moved from : " + oldPosition + " to : " + animal.getPosition());
         }else{
             mapChanged("animal in position: " + oldPosition + " changed its orientation to: " + animal.getCurrentOrientation());
@@ -183,6 +198,45 @@ public class GrassField extends AbstractWorldMap{
         }
 
         return free;
+    }
+
+    public WorldElement objectAt(Vector2d position) {
+        for (Animal animal: animalsObj) {
+            if (animal.getPosition().equals(position)) {
+//              returns strongest animal
+                ArrayList<Animal> strongestAnimals = animals.get(animal.getPosition()).findStrongestAnimals();
+                Random random = new Random();
+                int randomIdx = random.nextInt(strongestAnimals.size());
+                return strongestAnimals.get(randomIdx);
+            }
+        }
+
+        for (Grass plant: grassesObj) {
+            if (plant.getPosition().equals(position)) {
+                return plant;
+            }
+        }
+        return null;
+    }
+
+    public void eatGrassByAnimals(int energy) {
+        List<Vector2d> grassPositions = new ArrayList<>(grasses.keySet());
+
+        for (Vector2d position : grassPositions) {
+            SamePositionAnimals samePositionAnimals = animals.get(position);
+            Grass grassAtPosition = grasses.get(position);
+
+            if (samePositionAnimals != null && grassAtPosition != null && !samePositionAnimals.getAnimals().isEmpty()) {
+                List<Animal> animalsAtPosition = samePositionAnimals.getAnimals();
+                if (animalsAtPosition.size() > 1) {
+                    Animal strongestAnimal = samePositionAnimals.getRandomStrongest();
+                    grasses.remove(position);
+                    grassesObj.remove(grassAtPosition);
+                    strongestAnimal.animalEat(energy);
+                }
+            }
+        }
+        mapChanged("zjedzono rosline");
     }
 
 }

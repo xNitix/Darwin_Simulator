@@ -47,7 +47,7 @@ public class SimulationPresenter implements MapChangeListener {
     private int startEnergy;
     private int moveCost;
     private int startAnimalNumber;
-
+    private int enegryForGrass;
     private int plantPerDay;
 
     private SimulationEngine simulationEngine;
@@ -104,7 +104,7 @@ public class SimulationPresenter implements MapChangeListener {
                     komorka.setFill(Color.BLUE);
                 } else if (obiekt instanceof Animal) {
                     int energy = ((Animal) obiekt).getCurrentEnergy();
-                    System.out.println((double)energy/startEnergy*100);
+                    //System.out.println((double)energy/startEnergy*100);
                     if((double)energy/startEnergy*100 > 80){
                         komorka.setFill(Color.BLACK);
                     }else if((double)energy/startEnergy*100 <= 80 && (double)energy/startEnergy*100 > 60){
@@ -149,6 +149,7 @@ public class SimulationPresenter implements MapChangeListener {
             moveCost = Integer.parseInt(moveEnergyCost.getText());
             startAnimalNumber = Integer.parseInt(animalNumber.getText());
             plantPerDay = Integer.parseInt(plantPerDayField.getText());
+            enegryForGrass = Integer.parseInt(energyEatField.getText());
             cellSize=cellSize/width;
 
             if (width <= 0 || height <= 0 || grassQuantity < 0 || startEnergy < 0) {
@@ -164,7 +165,7 @@ public class SimulationPresenter implements MapChangeListener {
 
 
         List<Vector2d> positions = generateStartPositions();
-        Simulation simulation = new Simulation(positions, worldMap, (Integer) genNumber.getValue(), startEnergy, moveCost, plantPerDay);
+        Simulation simulation = new Simulation(positions, worldMap, (Integer) genNumber.getValue(), startEnergy, moveCost, plantPerDay, enegryForGrass);
 
         setWorldMap(worldMap);
         SimulationEngine simulationEngine = new SimulationEngine(Arrays.asList(simulation),4);

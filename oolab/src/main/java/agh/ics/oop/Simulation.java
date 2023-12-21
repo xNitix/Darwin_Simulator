@@ -16,10 +16,13 @@ public class Simulation implements Runnable{
 
     private final int plantPerDay;
 
+    private final int plantEnergy;
+
     private volatile boolean isPaused = false; // Flaga do zatrzymywania/wznawiania symulacji
 
 
-    public Simulation(List<Vector2d> initialPositions, WorldMap map, int genNumber, int startEnergy, int energyCost, int plantPerDay){
+    public Simulation(List<Vector2d> initialPositions, WorldMap map, int genNumber, int startEnergy, int energyCost, int plantPerDay, int plantEnergy){
+        this.plantEnergy = plantEnergy;
         List<Animal> animals = new ArrayList<>();
         this.energyCost = energyCost;
         this.plantPerDay = plantPerDay;
@@ -47,6 +50,7 @@ public class Simulation implements Runnable{
         while(true) {
             if (!isPaused) {
                 updateAnimals();
+                eat();
                 map.makeGrassMap(plantPerDay);
                 try {
                     Thread.sleep(1000); // Opóźnienie 1 sekunda między kolejnymi aktualizacjami
@@ -81,9 +85,15 @@ public class Simulation implements Runnable{
 
         for(Animal animal : animals){
             map.move(animal,-energyCost);
+            System.out.println(animal.getCurrentEnergy());
         }
 
     }
+
+    private void eat(){
+        map.eatGrassByAnimals(plantEnergy);
+    }
+
     public void stopSimulation() {
         isPaused = true;
     }
@@ -91,5 +101,7 @@ public class Simulation implements Runnable{
     public void resumeSimulation() {
         isPaused = false;
     }
+
+
 
 }

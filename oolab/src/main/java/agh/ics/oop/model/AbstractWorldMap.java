@@ -6,7 +6,13 @@ import agh.ics.oop.model.util.MapVisualizer;
 import java.util.*;
 
 public abstract class AbstractWorldMap implements WorldMap {
-    protected final Map<Vector2d, Animal> animals = new HashMap<>();
+
+    @Override
+    public Map<Vector2d, SamePositionAnimals> getAnimals() {
+        return animals;
+    }
+
+    protected final Map<Vector2d, SamePositionAnimals> animals = new HashMap<>();
 
     protected List<MapChangeListener> listeners = new ArrayList<>();
 
@@ -14,7 +20,7 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     protected final UUID id = UUID.randomUUID();
 
-
+    public ArrayList<Animal> animalsObj = new ArrayList<>();
 
 
     public void subscribe(MapChangeListener listener)
@@ -33,33 +39,48 @@ public abstract class AbstractWorldMap implements WorldMap {
         }
     }
 
-    public void place(Animal animal) throws PositionAlreadyOccupiedException {
+    public void place(Animal animal) {
         //if (canMoveTo(animal.getPosition())) {
-        animals.put(animal.getPosition(), animal);
+        addAnimalToMap(animal, animal.getPosition());
         mapChanged("animal placed : " + animal.getPosition());
+        animalsObj.add(animal);
         //} else {
         //    throw new PositionAlreadyOccupiedException(animal.getPosition());
         //}
 
     }
 
+    public void addAnimalToMap(Animal animal, Vector2d position){
+        if(!animals.containsKey(position)){
+            SamePositionAnimals samePositionAnimals = new SamePositionAnimals(position,animal,this);
+            animals.put(position, samePositionAnimals);
+        } else {
+            animals.get(position).addAnimal(animal);
+        }
+    }
+
     /*
     public boolean canMoveTo(Vector2d position) {
         return !animals.containsKey(position);
     }
-    */
+
+     */
+
     public boolean isOccupied(Vector2d position) {
         return animals.containsKey((position));
     }
 
-    public WorldElement objectAt(Vector2d position) {
-        
-        return this.animals.get(position);
-    }
+
 
     public Collection<WorldElement> getElements() {
-        return new ArrayList<>(animals.values());
+        List<WorldElement> elements = new ArrayList<>();
+        for (SamePositionAnimals samePositionAnimals : animals.values()) {
+            elements.addAll(samePositionAnimals.getAnimals());
+        }
+        return elements;
     }
+
+
 
     @Override
     public String toString() {

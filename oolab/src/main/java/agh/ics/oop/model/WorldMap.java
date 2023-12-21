@@ -3,6 +3,7 @@ package agh.ics.oop.model;
 import agh.ics.oop.model.Exceptions.PositionAlreadyOccupiedException;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -54,4 +55,12 @@ public interface WorldMap extends MoveValidator {
     FieldType getFieldType(Vector2d position);
 
     void makeGrassMap(int quantity);
+
+     Map<Vector2d, Grass> getGrasses();
+
+    Map<Vector2d, SamePositionAnimals> getAnimals();
+
+    void addAnimalToMap(Animal animal, Vector2d position);
+
+    void eatGrassByAnimals(int energy);
 }

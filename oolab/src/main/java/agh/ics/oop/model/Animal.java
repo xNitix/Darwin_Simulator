@@ -7,7 +7,6 @@ public class Animal implements WorldElement{
     public int[] getGenoType() {
         return genoType;
     }
-
     private final int[] genoType;
     private int wchichGen = 0;
     private final int startEnergy;
@@ -19,6 +18,19 @@ public class Animal implements WorldElement{
     }
 
     private int currentEnergy;
+
+    public int getDayAlive() {
+        return dayAlive;
+    }
+
+    private int dayAlive = 0;
+
+    public int getChildNumber() {
+        return childNumber;
+    }
+
+    private int childNumber = 0;
+
 
     public Animal(Vector2d position, int[] genoType, int currentEnergy, WorldMap map)
     {
@@ -57,12 +69,21 @@ public class Animal implements WorldElement{
             currentEnergy += eneryCost;
         }
         wchichGen++;
+        dayAlive++;
+
+
+
+
         /*
             if(validator.canMoveTo(newPosition)){
                 this.position = newPosition;
             }
 
          */
+    }
+
+    public void animalEat(int energy){
+        currentEnergy += energy;
     }
 
 
