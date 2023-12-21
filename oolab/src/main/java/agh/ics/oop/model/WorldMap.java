@@ -63,4 +63,6 @@ public interface WorldMap extends MoveValidator {
     void addAnimalToMap(Animal animal, Vector2d position);
 
     void eatGrassByAnimals(int energy);
+
+    void removeAnimalFromMap(Animal animalToRemove);
 }

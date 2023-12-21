@@ -204,6 +204,7 @@ public class GrassField extends AbstractWorldMap{
         for (Animal animal: animalsObj) {
             if (animal.getPosition().equals(position)) {
 //              returns strongest animal
+
                 ArrayList<Animal> strongestAnimals = animals.get(animal.getPosition()).findStrongestAnimals();
                 Random random = new Random();
                 int randomIdx = random.nextInt(strongestAnimals.size());
@@ -237,6 +238,26 @@ public class GrassField extends AbstractWorldMap{
             }
         }
         mapChanged("zjedzono rosline");
+    }
+
+    public void removeAnimalFromMap(Animal animalToRemove) {
+        Vector2d position = animalToRemove.getPosition();
+        SamePositionAnimals samePositionAnimals = animals.get(position);
+        if (samePositionAnimals != null) {
+            samePositionAnimals.removeAnimal(animalToRemove);
+            animals.remove(position);
+            removeDeadAnimalsFromList();
+        }
+    }
+
+    public void removeDeadAnimalsFromList() {
+        Iterator<Animal> iterator = animalsObj.iterator();
+        while(iterator.hasNext()) {
+            Animal animal = iterator.next();
+            if (animal.getCurrentEnergy() < 0) {
+                iterator.remove();
+            }
+        }
     }
 
 }

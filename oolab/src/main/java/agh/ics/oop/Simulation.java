@@ -9,6 +9,7 @@ import java.util.*;
 public class Simulation implements Runnable{
 
     private List<Animal> animals;
+    private List<Animal> deadAnimals = new ArrayList<>();
 
     private WorldMap map;
 
@@ -49,6 +50,8 @@ public class Simulation implements Runnable{
     public void run(){
         while(true) {
             if (!isPaused) {
+                System.out.println(deadAnimals.size());
+                removeDeadAnimals();
                 updateAnimals();
                 eat();
                 map.makeGrassMap(plantPerDay);
@@ -100,6 +103,18 @@ public class Simulation implements Runnable{
 
     public void resumeSimulation() {
         isPaused = false;
+    }
+
+    public void removeDeadAnimals() {
+        Iterator<Animal> iterator = animals.iterator();
+        while (iterator.hasNext()) {
+            Animal animal = iterator.next();
+            if (animal.getCurrentEnergy() < 0) {
+                map.removeAnimalFromMap(animal);
+                deadAnimals.add(animal);
+                iterator.remove();
+            }
+        }
     }
 
 

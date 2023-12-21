@@ -101,7 +101,7 @@ public class SimulationPresenter implements MapChangeListener {
                 // Ustawianie kolorów na podstawie typu obiektu na danej pozycji
                 Object obiekt = worldMap.objectAt(aktualnaPozycja);
                 if (obiekt instanceof Grass) {
-                    komorka.setFill(Color.BLUE);
+                    komorka.setFill(Color.RED);
                 } else if (obiekt instanceof Animal) {
                     int energy = ((Animal) obiekt).getCurrentEnergy();
                     //System.out.println((double)energy/startEnergy*100);
@@ -110,18 +110,18 @@ public class SimulationPresenter implements MapChangeListener {
                     }else if((double)energy/startEnergy*100 <= 80 && (double)energy/startEnergy*100 > 60){
                         komorka.setFill(Color.GRAY);
                     }else if((double)energy/startEnergy*100 <= 60 && (double)energy/startEnergy*100 > 40){
-                        komorka.setFill(Color.RED);
+                        komorka.setFill(Color.rgb(150, 75, 0));
                     }else if((double)energy/startEnergy*100 <= 40 && (double)energy/startEnergy*100 > 20){
-                        komorka.setFill(Color.ORANGE);
+                        komorka.setFill(Color.rgb(255, 140, 0));
                     }else if((double)energy/startEnergy*100 <= 20 && (double)energy/startEnergy*100 >= 0){
-                        komorka.setFill(Color.YELLOW);
+                        komorka.setFill(Color.rgb(255, 255, 0));
                     }
                 } else {
                     FieldType fieldType = worldMap.getFieldType(aktualnaPozycja);
                     if(fieldType == FieldType.PREFERRED){
-                        komorka.setFill(Color.GREEN);
+                        komorka.setFill(Color.rgb(0, 100, 0));
                     } else {
-                        komorka.setFill(Color.BROWN);
+                        komorka.setFill(Color.rgb(100, 50, 0));
                     }
                 }
 
