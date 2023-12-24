@@ -1,5 +1,4 @@
 package agh.ics.oop.presenter;
-import agh.ics.oop.OptionsParser;
 import agh.ics.oop.Simulation;
 import agh.ics.oop.model.*;
 import javafx.application.Platform;
@@ -20,6 +19,14 @@ import java.util.List;
 import java.util.Random;
 
 public class SimulationPresenter implements MapChangeListener {
+    @FXML
+    private TextField maxMutationsField;
+    @FXML
+    private TextField minMutationsField;
+    @FXML
+    private TextField reproduceEnergyLostField;
+    @FXML
+    private TextField reproduceEnergyField;
     @FXML
     private TextField moveEnergyCost;
     @FXML
@@ -47,10 +54,13 @@ public class SimulationPresenter implements MapChangeListener {
     private int startEnergy;
     private int moveCost;
     private int startAnimalNumber;
-    private int enegryForGrass;
+    private int energyForGrass;
     private int plantPerDay;
-
+    private int reproduceEnergy;
+    private int reproduceEnergyLost;
     private SimulationEngine simulationEngine;
+    private int maxMutations;
+    private int minMutations;
     public void setWorldMap(WorldMap worldMap) {
         this.worldMap = worldMap;
     }
@@ -149,7 +159,11 @@ public class SimulationPresenter implements MapChangeListener {
             moveCost = Integer.parseInt(moveEnergyCost.getText());
             startAnimalNumber = Integer.parseInt(animalNumber.getText());
             plantPerDay = Integer.parseInt(plantPerDayField.getText());
-            enegryForGrass = Integer.parseInt(energyEatField.getText());
+            energyForGrass = Integer.parseInt(energyEatField.getText());
+            reproduceEnergy = Integer.parseInt(reproduceEnergyField.getText());
+            reproduceEnergyLost = Integer.parseInt(reproduceEnergyLostField.getText());
+            minMutations = Integer.parseInt(minMutationsField.getText());
+            maxMutations = Integer.parseInt(maxMutationsField.getText());
             cellSize=cellSize/width;
 
             if (width <= 0 || height <= 0 || grassQuantity < 0 || startEnergy < 0) {
@@ -165,7 +179,7 @@ public class SimulationPresenter implements MapChangeListener {
 
 
         List<Vector2d> positions = generateStartPositions();
-        Simulation simulation = new Simulation(positions, worldMap, (Integer) genNumber.getValue(), startEnergy, moveCost, plantPerDay, enegryForGrass);
+        Simulation simulation = new Simulation(positions, worldMap, (Integer) genNumber.getValue(), startEnergy, moveCost, plantPerDay, energyForGrass, reproduceEnergy, reproduceEnergyLost, minMutations, maxMutations);
 
         setWorldMap(worldMap);
         SimulationEngine simulationEngine = new SimulationEngine(Arrays.asList(simulation),4);

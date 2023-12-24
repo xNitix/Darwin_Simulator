@@ -1,5 +1,7 @@
 package agh.ics.oop.model;
 
+import java.util.Random;
+
 public class Animal implements WorldElement{
     private MapDirection currentOrientation;
     private Vector2d position;
@@ -8,7 +10,7 @@ public class Animal implements WorldElement{
         return genoType;
     }
     private final int[] genoType;
-    private int wchichGen = 0;
+    private int whichGen;
     private final int startEnergy;
 
     private final WorldMap map;
@@ -34,12 +36,14 @@ public class Animal implements WorldElement{
 
     public Animal(Vector2d position, int[] genoType, int currentEnergy, WorldMap map)
     {
+        Random random = new Random();
         this.position = position;
         this.currentOrientation = MapDirection.NORTH;
         this.genoType = genoType;
         this.currentEnergy = currentEnergy;
         this.startEnergy = currentEnergy;
         this.map = map;
+        this.whichGen = random.nextInt(8);
     }
 
 
@@ -56,19 +60,19 @@ public class Animal implements WorldElement{
     }
 
     public MapDirection getNewDirection(){
-        int newDirectionId = (currentOrientation.directionToId() + genoType[wchichGen%genoType.length])%8;
+        int newDirectionId = (currentOrientation.directionToId() + genoType[whichGen %genoType.length])%8;
         currentOrientation = currentOrientation.idToDirection(newDirectionId);
         return currentOrientation;
     }
 
-    public void move(int eneryCost,Vector2d newPosition ){
+    public void move(int energyCost,Vector2d newPosition ){
         if(this.position == newPosition){
             currentOrientation = currentOrientation.getReverse(currentOrientation.directionToId());
         } else {
             this.position = newPosition;
-            currentEnergy += eneryCost;
         }
-        wchichGen++;
+        currentEnergy += energyCost;
+        whichGen++;
         dayAlive++;
 
 

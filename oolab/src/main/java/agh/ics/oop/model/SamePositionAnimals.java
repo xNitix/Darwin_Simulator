@@ -22,7 +22,17 @@ public class SamePositionAnimals implements WorldElement {
     }
 
     public void addAnimal(Animal animal){
-        animals.add(animal);
+        int flag = 0;
+        for(Animal animalc : animals){
+            if (animalc.equals(animal)) {
+                flag = 1;
+                break;
+            }
+        }
+        if(flag == 0){
+            animals.add(animal);
+        }
+
     }
 
     public void removeAnimal(Animal animalToRemove) {

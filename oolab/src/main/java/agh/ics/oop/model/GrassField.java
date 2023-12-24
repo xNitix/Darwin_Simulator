@@ -81,18 +81,19 @@ public class GrassField extends AbstractWorldMap{
         Collections.shuffle(unattractivePositions);
 
         while(addedGrass < quantity && !isMapFullOfGrass() && (!preferredPositions.isEmpty() || !unattractivePositions.isEmpty())) {
-
-            //System.out.println(preferredPositions.size());
-            ///System.out.println(unattractivePositions.size());
-
             double grassProbability = Math.random();
 
             Vector2d newPosition;
-            if(grassProbability <= 0.8 && !preferredPositions.isEmpty()) {
+            if(grassProbability <= 0.8 && !preferredPositions.isEmpty() && !unattractivePositions.isEmpty()) {
                 newPosition = preferredPositions.remove(0);
-            } else {
+            } else if(grassProbability > 0.8 && !preferredPositions.isEmpty() && !unattractivePositions.isEmpty()) {
                 newPosition = unattractivePositions.remove(0);
+            } else if(!unattractivePositions.isEmpty()) {
+                newPosition = unattractivePositions.remove(0);
+            } else {
+                newPosition = preferredPositions.remove(0);
             }
+
             Grass newGrass = new Grass(newPosition);
             grasses.put(newPosition, newGrass);
             grassesObj.add(newGrass);
@@ -200,21 +201,27 @@ public class GrassField extends AbstractWorldMap{
         return free;
     }
 
-    public WorldElement objectAt(Vector2d position) {
-        for (Animal animal: animalsObj) {
+    public synchronized WorldElement objectAt(Vector2d position) {
+        List<Animal> copyOfAnimals = new ArrayList<>(animalsObj);
+        for (Animal animal : copyOfAnimals) {
             if (animal.getPosition().equals(position)) {
 //              returns strongest animal
 
-                ArrayList<Animal> strongestAnimals = animals.get(animal.getPosition()).findStrongestAnimals();
-                Random random = new Random();
-                int randomIdx = random.nextInt(strongestAnimals.size());
-                return strongestAnimals.get(randomIdx);
+                SamePositionAnimals samePositionAnimals = animals.get(animal.getPosition());
+                if(samePositionAnimals != null){
+                    List <Animal> strongestAnimals = animals.get(animal.getPosition()).findStrongestAnimals();
+                    Random random = new Random();
+                    int randomIdx = random.nextInt(strongestAnimals.size());
+                    return strongestAnimals.get(randomIdx);
+                }
+                return null;
             }
         }
 
-        for (Grass plant: grassesObj) {
-            if (plant.getPosition().equals(position)) {
-                return plant;
+        List<Grass> copyOfGrasses = new ArrayList<>(grassesObj);
+        for (Grass grass : copyOfGrasses) {
+            if (grass.getPosition().equals(position)) {
+                return grass;
             }
         }
         return null;
@@ -229,7 +236,7 @@ public class GrassField extends AbstractWorldMap{
 
             if (samePositionAnimals != null && grassAtPosition != null && !samePositionAnimals.getAnimals().isEmpty()) {
                 List<Animal> animalsAtPosition = samePositionAnimals.getAnimals();
-                if (animalsAtPosition.size() > 1) {
+                if (animalsAtPosition.size() >= 1) {
                     Animal strongestAnimal = samePositionAnimals.getRandomStrongest();
                     grasses.remove(position);
                     grassesObj.remove(grassAtPosition);
@@ -251,13 +258,50 @@ public class GrassField extends AbstractWorldMap{
     }
 
     public void removeDeadAnimalsFromList() {
-        Iterator<Animal> iterator = animalsObj.iterator();
-        while(iterator.hasNext()) {
-            Animal animal = iterator.next();
-            if (animal.getCurrentEnergy() < 0) {
-                iterator.remove();
+        animalsObj.removeIf(animal -> animal.getCurrentEnergy() < 0);
+    }
+
+    public List<Animal> reproduce(int genNumber, int minMutations, int maxMutations, int reproduceCost, int energyRequired) {
+        //System.out.println("map");
+        List<Vector2d> animalsPositions = new ArrayList<>(animals.keySet());
+        List<Animal> childs = new ArrayList<>();
+
+        for (Vector2d position : animalsPositions) {
+            //System.out.println("for");
+            SamePositionAnimals samePositionAnimals = animals.get(position);
+
+            if (samePositionAnimals != null && !samePositionAnimals.getAnimals().isEmpty()) {
+                //System.out.println("if1");
+                List<Animal> animalsAtPosition = samePositionAnimals.getAnimals();
+                System.out.println(animalsAtPosition.size() + "fff");
+
+                if (animalsAtPosition.size() > 1) {
+
+                    //System.out.println("if3");
+                    animalsAtPosition = samePositionAnimals.findTwoStrongestAnimals();
+                    //System.out.println("if6");
+                    Animal animal1 = animalsAtPosition.get(0);
+                    Animal animal2 = animalsAtPosition.get(1);
+                    //System.out.println("if7");
+                    if(animal1.getCurrentEnergy() >= energyRequired && animal2.getCurrentEnergy() >= energyRequired) {
+                        //System.out.println("if4");
+                        int[] childGenType = GenoType.combineGenoType(genNumber, animal1, animal2, minMutations, maxMutations);
+                        //System.out.println("if5");
+                        animal1.animalEat(-reproduceCost);
+                        animal2.animalEat(-reproduceCost);
+                        //System.out.println("if10");
+                        Animal child = new Animal(animal1.getPosition(), childGenType, 2 * reproduceCost, this);
+                        //System.out.println("if11");
+                        place(child);
+                        //System.out.println("if12");
+                        animalsObj.add(child);
+                        childs.add(child);
+                        //System.out.println("if13");
+                    }
+                }
             }
         }
+        return childs;
     }
 
 }

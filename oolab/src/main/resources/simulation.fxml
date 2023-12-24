@@ -48,6 +48,17 @@
             <Label text="Number of mutations"/>
             <TextField fx:id="mutationsNumber" promptText="Enter Number of mutations"/>
 
+            <Label text="Reproduce energy"/>
+            <TextField fx:id="reproduceEnergyField" promptText="Enter energy required to reproduce"/>
+
+            <Label text="Energy cost for each parent"/>
+            <TextField fx:id="reproduceEnergyLostField" promptText="Enter cost of energy for each parent intended for the child"/>
+
+            <Label text="Minimum number of mutations"/>
+            <TextField fx:id="minMutationsField" promptText="Enter Minimum number of mutations"/>
+
+            <Label text="Maximum number of mutations"/>
+            <TextField fx:id="maxMutationsField" promptText="Enter Maximum number of mutations"/>
 
 
 

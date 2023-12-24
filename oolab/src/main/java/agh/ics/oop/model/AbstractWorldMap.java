@@ -7,11 +7,6 @@ import java.util.*;
 
 public abstract class AbstractWorldMap implements WorldMap {
 
-    @Override
-    public Map<Vector2d, SamePositionAnimals> getAnimals() {
-        return animals;
-    }
-
     protected final Map<Vector2d, SamePositionAnimals> animals = new HashMap<>();
 
     protected List<MapChangeListener> listeners = new ArrayList<>();
@@ -19,6 +14,10 @@ public abstract class AbstractWorldMap implements WorldMap {
     protected final MapVisualizer mapVisualizer = new MapVisualizer(this);
 
     protected final UUID id = UUID.randomUUID();
+
+    public ArrayList<Animal> getAnimalsObj() {
+        return animalsObj;
+    }
 
     public ArrayList<Animal> animalsObj = new ArrayList<>();
 
