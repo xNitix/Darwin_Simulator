@@ -1,6 +1,7 @@
 package agh.ics.oop.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -11,11 +12,11 @@ public class SamePositionAnimals implements WorldElement {
         return animals;
     }
 
-    private final List<Animal> animals = new ArrayList<>();
+    private final List<Animal> animals = Collections.synchronizedList(new ArrayList<>());
 
-    private final AbstractWorldMap map;
+    private final GrassField map;
 
-    public SamePositionAnimals(Vector2d position, Animal animal, AbstractWorldMap map) {
+    public SamePositionAnimals(Vector2d position, Animal animal, GrassField map) {
         this.position = position;
         animals.add(animal);
         this.map = map;

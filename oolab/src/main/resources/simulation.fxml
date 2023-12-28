@@ -13,7 +13,7 @@
             fx:controller="agh.ics.oop.presenter.SimulationPresenter">
     <center>
         <Label fx:id="infoLabel" text="All animals will be living here!" textAlignment="CENTER"/>
-        <GridPane fx:id="mapGrid" gridLinesVisible="true" alignment="CENTER"/>
+        <GridPane fx:id="mapGrid1" gridLinesVisible="true" alignment="CENTER"/>
     </center>
 
     <left>
@@ -45,9 +45,6 @@
             <Label text="New plant per day"/>
             <TextField fx:id="plantPerDayField" promptText="Enter how many plants should appear every day"/>
 
-            <Label text="Number of mutations"/>
-            <TextField fx:id="mutationsNumber" promptText="Enter Number of mutations"/>
-
             <Label text="Reproduce energy"/>
             <TextField fx:id="reproduceEnergyField" promptText="Enter energy required to reproduce"/>
 
@@ -60,11 +57,6 @@
             <Label text="Maximum number of mutations"/>
             <TextField fx:id="maxMutationsField" promptText="Enter Maximum number of mutations"/>
 
-
-
-            <Button fx:id="startButton" text="Start" onAction="#onSimulationStartClicked"/>
-            <Button fx:id="pauseButton" text="Pause" onAction="#onPauseSimulation"/>
-            <Button fx:id="resetButton" text="Reset" onAction="#onResumeSimulation"/>
         </VBox>
     </left>
 

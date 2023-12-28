@@ -6,7 +6,7 @@ import agh.ics.oop.model.util.MapVisualizer;
 import java.util.*;
 
 public abstract class AbstractWorldMap implements WorldMap {
-
+/*
     protected final Map<Vector2d, SamePositionAnimals> animals = new HashMap<>();
 
     protected List<MapChangeListener> listeners = new ArrayList<>();
@@ -15,7 +15,7 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     protected final UUID id = UUID.randomUUID();
 
-    public ArrayList<Animal> getAnimalsObj() {
+    public synchronized ArrayList<Animal> getAnimalsObj() {
         return animalsObj;
     }
 
@@ -38,7 +38,7 @@ public abstract class AbstractWorldMap implements WorldMap {
         }
     }
 
-    public void place(Animal animal) {
+    public synchronized void place(Animal animal) {
         //if (canMoveTo(animal.getPosition())) {
         addAnimalToMap(animal, animal.getPosition());
         mapChanged("animal placed : " + animal.getPosition());
@@ -49,7 +49,7 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     }
 
-    public void addAnimalToMap(Animal animal, Vector2d position){
+    public synchronized void addAnimalToMap(Animal animal, Vector2d position){
         if(!animals.containsKey(position)){
             SamePositionAnimals samePositionAnimals = new SamePositionAnimals(position,animal,this);
             animals.put(position, samePositionAnimals);
@@ -63,7 +63,7 @@ public abstract class AbstractWorldMap implements WorldMap {
         return !animals.containsKey(position);
     }
 
-     */
+
 
     public boolean isOccupied(Vector2d position) {
         return animals.containsKey((position));
@@ -86,5 +86,5 @@ public abstract class AbstractWorldMap implements WorldMap {
         Boundary boundary = getCurrentBounds();
         return mapVisualizer.draw(boundary.leftDown(),boundary.rightUp());
     }
-
+*/
 }

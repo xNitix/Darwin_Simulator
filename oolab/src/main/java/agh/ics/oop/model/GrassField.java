@@ -1,23 +1,104 @@
 package agh.ics.oop.model;
 
+import agh.ics.oop.model.util.MapVisualizer;
+
 import java.util.*;
 
-public class GrassField extends AbstractWorldMap{
+public class GrassField {
     private final Map<Vector2d, FieldType> fieldTypes = new HashMap<>();
+
+    protected final Map<Vector2d, SamePositionAnimals> animals = new HashMap<>();
+    private final Map<Vector2d, Grass> grasses = Collections.synchronizedMap(new HashMap<>());
+
+    public ArrayList<Animal> animalsObj = new ArrayList<>();
+    private final List<Grass> grassesObj = Collections.synchronizedList(new ArrayList<>());
 
     public Map<Vector2d, Grass> getGrasses() {
         return grasses;
     }
-    private final Map<Vector2d,Grass> grasses = new HashMap<>();
     private final Vector2d leftDownGrass;
     private final Vector2d rightUpGrass;
 
-    public ArrayList<Grass> getGrassesObj() {
-        return grassesObj;
+    protected List<MapChangeListener> listeners = new ArrayList<>();
+
+    protected final MapVisualizer mapVisualizer = new MapVisualizer(this);
+
+    protected final UUID id = UUID.randomUUID();
+
+    public synchronized ArrayList<Animal> getAnimalsObj() {
+        return animalsObj;
     }
 
-    public ArrayList<Grass> grassesObj = new ArrayList<>();
 
+
+    public void subscribe(MapChangeListener listener)
+    {
+        listeners.add(listener);
+    }
+
+    public void unSubscribe(MapChangeListener listener)
+    {
+        listeners.remove(listener);
+    }
+
+    protected void mapChanged(String message){
+        for(MapChangeListener listener : listeners){
+            listener.mapChanged(this,message);
+        }
+    }
+
+    public synchronized void place(Animal animal) {
+        //if (canMoveTo(animal.getPosition())) {
+        addAnimalToMap(animal, animal.getPosition());
+        mapChanged("animal placed : " + animal.getPosition());
+        animalsObj.add(animal);
+        //} else {
+        //    throw new PositionAlreadyOccupiedException(animal.getPosition());
+        //}
+
+    }
+
+    public synchronized void addAnimalToMap(Animal animal, Vector2d position){
+        if(!animals.containsKey(position)){
+            SamePositionAnimals samePositionAnimals = new SamePositionAnimals(position,animal,this);
+            animals.put(position, samePositionAnimals);
+        } else {
+            animals.get(position).addAnimal(animal);
+        }
+    }
+
+    /*
+    public boolean canMoveTo(Vector2d position) {
+        return !animals.containsKey(position);
+    }
+
+     */
+
+    public boolean isOccupied(Vector2d position) {
+        return animals.containsKey((position)) || grasses.containsKey(position);
+    }
+
+
+
+    public Collection<WorldElement> getElements() {
+        List<WorldElement> elements = new ArrayList<>();
+        for (SamePositionAnimals samePositionAnimals : animals.values()) {
+            elements.addAll(samePositionAnimals.getAnimals());
+        }
+
+        Collection<WorldElement> allElements = new ArrayList<>(elements);
+        allElements.addAll(grasses.values());
+        return allElements;
+
+    }
+
+
+
+    @Override
+    public String toString() {
+        Boundary boundary = getCurrentBounds();
+        return mapVisualizer.draw(boundary.leftDown(),boundary.rightUp());
+    }
 
     public GrassField(int grassFilesQuantity, int width, int height) {
         leftDownGrass = new Vector2d(0,0);
@@ -101,28 +182,16 @@ public class GrassField extends AbstractWorldMap{
         }
     }
 
-    @Override
-    public boolean isOccupied(Vector2d position) {
-        return super.isOccupied(position) || grasses.containsKey(position);
-    }
 
-    @Override
-    public Collection<WorldElement> getElements() {
-        Collection<WorldElement> allElements = new ArrayList<>(super.getElements());
-        allElements.addAll(grasses.values());
-        return allElements;
-    }
-
-    @Override
     public Boundary getCurrentBounds() {
         return new Boundary(leftDownGrass,rightUpGrass);
     }
-    @Override
+
     public UUID getID() {
         return id;
     }
 
-    public void move(Animal animal, int energyCost) {
+    public synchronized void move(Animal animal, int energyCost) {
 
        // System.out.println(Arrays.toString(animal.getGenoType()));
         MapDirection newDirection= animal.getNewDirection();
@@ -201,7 +270,7 @@ public class GrassField extends AbstractWorldMap{
         return free;
     }
 
-    public synchronized WorldElement objectAt(Vector2d position) {
+    public WorldElement objectAt(Vector2d position) {
         List<Animal> copyOfAnimals = new ArrayList<>(animalsObj);
         for (Animal animal : copyOfAnimals) {
             if (animal.getPosition().equals(position)) {
@@ -247,7 +316,7 @@ public class GrassField extends AbstractWorldMap{
         mapChanged("zjedzono rosline");
     }
 
-    public void removeAnimalFromMap(Animal animalToRemove) {
+    public synchronized void removeAnimalFromMap(Animal animalToRemove) {
         Vector2d position = animalToRemove.getPosition();
         SamePositionAnimals samePositionAnimals = animals.get(position);
         if (samePositionAnimals != null) {
@@ -257,11 +326,11 @@ public class GrassField extends AbstractWorldMap{
         }
     }
 
-    public void removeDeadAnimalsFromList() {
+    public synchronized void removeDeadAnimalsFromList() {
         animalsObj.removeIf(animal -> animal.getCurrentEnergy() < 0);
     }
 
-    public List<Animal> reproduce(int genNumber, int minMutations, int maxMutations, int reproduceCost, int energyRequired) {
+    public synchronized List<Animal> reproduce(int genNumber, int minMutations, int maxMutations, int reproduceCost, int energyRequired) {
         //System.out.println("map");
         List<Vector2d> animalsPositions = new ArrayList<>(animals.keySet());
         List<Animal> childs = new ArrayList<>();
@@ -273,7 +342,7 @@ public class GrassField extends AbstractWorldMap{
             if (samePositionAnimals != null && !samePositionAnimals.getAnimals().isEmpty()) {
                 //System.out.println("if1");
                 List<Animal> animalsAtPosition = samePositionAnimals.getAnimals();
-                System.out.println(animalsAtPosition.size() + "fff");
+                //System.out.println(animalsAtPosition.size() + "fff");
 
                 if (animalsAtPosition.size() > 1) {
 
@@ -294,7 +363,9 @@ public class GrassField extends AbstractWorldMap{
                         //System.out.println("if11");
                         place(child);
                         //System.out.println("if12");
+                        System.out.println(animalsObj.size() + "przed rozmnozeniem");
                         animalsObj.add(child);
+                        System.out.println(animalsObj.size() + "po rozmnozeniu");
                         childs.add(child);
                         //System.out.println("if13");
                     }

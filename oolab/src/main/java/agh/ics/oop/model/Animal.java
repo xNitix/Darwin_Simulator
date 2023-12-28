@@ -13,7 +13,7 @@ public class Animal implements WorldElement{
     private int whichGen;
     private final int startEnergy;
 
-    private final WorldMap map;
+    private final GrassField map;
 
     public int getCurrentEnergy() {
         return currentEnergy;
@@ -34,7 +34,7 @@ public class Animal implements WorldElement{
     private int childNumber = 0;
 
 
-    public Animal(Vector2d position, int[] genoType, int currentEnergy, WorldMap map)
+    public Animal(Vector2d position, int[] genoType, int currentEnergy, GrassField map)
     {
         Random random = new Random();
         this.position = position;
@@ -74,7 +74,7 @@ public class Animal implements WorldElement{
         currentEnergy += energyCost;
         whichGen++;
         dayAlive++;
-
+        System.out.println(getCurrentEnergy());
 
 
 

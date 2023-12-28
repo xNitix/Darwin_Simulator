@@ -4,7 +4,7 @@ public class ConsoleMapDisplay implements MapChangeListener {
 
     private int uppdateCounter;
     @Override
-    public synchronized void mapChanged(WorldMap worldMap, String message) {
+    public synchronized void mapChanged(GrassField worldMap, String message) {
         uppdateCounter ++;
         System.out.println(worldMap.getID());
         System.out.println(message);
