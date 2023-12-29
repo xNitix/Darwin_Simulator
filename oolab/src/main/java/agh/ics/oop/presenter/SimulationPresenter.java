@@ -6,9 +6,8 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
+import javafx.scene.control.*;
 import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -24,6 +23,14 @@ import javafx.scene.image.ImageView;
 
 
 public class SimulationPresenter implements MapChangeListener {
+    @FXML
+    private RadioButton madnessNextGenButton;
+    @FXML
+    private RadioButton normalNextGenButton;
+    @FXML
+    private RadioButton forestedEquatorRadioButton;
+    @FXML
+    private RadioButton poisonedFruitRadioButton;
     @FXML
     private TextField maxMutationsField;
     @FXML
@@ -73,6 +80,13 @@ public class SimulationPresenter implements MapChangeListener {
     private SimulationEngine simulationEngine;
     private int maxMutations;
     private int minMutations;
+
+    private ToggleGroup radioGroup;
+
+    private ToggleGroup radioGroupGen;
+
+    private Boolean isSpecial = false;
+    private Boolean isSpecialGen = false;
 
     Image blackCat = new Image("file:oolab/src/main/resources/koty/kot1.png");
     Image grayCat = new Image("file:oolab/src/main/resources/koty/kot2.png");
@@ -165,6 +179,11 @@ public class SimulationPresenter implements MapChangeListener {
                     imageView.setFitWidth(cellSize);
                     imageView.setFitHeight(cellSize);
                     mapGrid.add(imageView, x, numRows - y);
+                } else if(obiekt instanceof BadGrass) {
+                    ImageView imageView = new ImageView(badPlant);
+                    imageView.setFitWidth(cellSize);
+                    imageView.setFitHeight(cellSize);
+                    mapGrid.add(imageView, x, numRows - y);
                 } else if (obiekt instanceof Animal) {
                     int energy = ((Animal) obiekt).getCurrentEnergy();
                     //System.out.println((double)energy/startEnergy*100);
@@ -229,13 +248,13 @@ public class SimulationPresenter implements MapChangeListener {
             if (width <= 0 || height <= 0 || grassQuantity < 0 || startEnergy < 0) {
 
             } else {
-                GrassField map = new GrassField(grassQuantity, width, height);
+                GrassField map = new GrassField(grassQuantity, width, height, isSpecial, isSpecialGen);
                 statistics = new SimulationStatistics(map);
                 map.subscribe(this);
                 setWorldMap(map);
 
                 List<Vector2d> positions = generateStartPositions();
-                Simulation simulation = new Simulation(positions, worldMap, (Integer) genNumber.getValue(), startEnergy, moveCost, plantPerDay, energyForGrass, reproduceEnergy, reproduceEnergyLost, minMutations, maxMutations);
+                Simulation simulation = new Simulation(positions, worldMap, (Integer) genNumber.getValue(), startEnergy, moveCost, plantPerDay, energyForGrass, reproduceEnergy, reproduceEnergyLost, minMutations, maxMutations, isSpecialGen);
 
                 SimulationEngine simulationEngine = new SimulationEngine(Arrays.asList(simulation), 4);
                 this.simulationEngine = simulationEngine;
@@ -259,6 +278,35 @@ public class SimulationPresenter implements MapChangeListener {
     }
 
     public void initialize() {
+        radioGroup = new ToggleGroup();
+        poisonedFruitRadioButton.setToggleGroup(radioGroup);
+        forestedEquatorRadioButton.setToggleGroup(radioGroup);
+        // Ustawienie domyślnie zaznaczonego przycisku
+        forestedEquatorRadioButton.setSelected(true);
+
+        radioGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            RadioButton selectedRadioButton = (RadioButton) newValue;
+            if (selectedRadioButton == poisonedFruitRadioButton) {
+                isSpecial = true;
+            } else if (selectedRadioButton == forestedEquatorRadioButton) {
+                isSpecial = false;
+            }
+        });
+
+        radioGroupGen = new ToggleGroup();
+        normalNextGenButton.setToggleGroup(radioGroupGen);
+        madnessNextGenButton.setToggleGroup(radioGroupGen);
+        normalNextGenButton.setSelected(true);
+
+        radioGroupGen.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            RadioButton selectedRadioButton = (RadioButton) newValue;
+            if (selectedRadioButton == madnessNextGenButton) {
+                isSpecialGen = true;
+            } else if (selectedRadioButton == normalNextGenButton) {
+                isSpecialGen = false;
+            }
+        });
+
         // Ustawienie wartości domyślnej dla Spinnera genNumber
         genNumber.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 10)); // zakres od 0 do oo, wartość domyślna 5
         animalNumber.setText("3");
@@ -273,6 +321,24 @@ public class SimulationPresenter implements MapChangeListener {
         reproduceEnergyLostField.setText("4");
         minMutationsField.setText("4");
         maxMutationsField.setText("7");
+    }
+
+    @FXML
+    private void onRadioButtonClicked() {
+        if (poisonedFruitRadioButton.isSelected()) {
+            isSpecial = true;
+        } else if (forestedEquatorRadioButton.isSelected()) {
+            isSpecial = false;
+        }
+    }
+
+    @FXML
+    private void onRadioButtonClickedGen() {
+        if (madnessNextGenButton.isSelected()) {
+            isSpecialGen = true;
+        } else if (normalNextGenButton.isSelected()) {
+            isSpecialGen = false;
+        }
     }
 
     private List<Vector2d> generateStartPositions(){

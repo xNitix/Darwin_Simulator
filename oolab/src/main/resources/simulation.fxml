@@ -3,17 +3,24 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.ToggleGroup?>
 
 <?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleButton?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             minHeight="550.0" minWidth="850.0"
             fx:controller="agh.ics.oop.presenter.SimulationPresenter">
     <center>
-        <Label fx:id="infoLabel" text="All animals will be living here!" textAlignment="CENTER"/>
-        <GridPane fx:id="mapGrid1" gridLinesVisible="true" alignment="CENTER"/>
+        <VBox>
+            <Label text="Choose an option:"/>
+            <RadioButton fx:id="forestedEquatorRadioButton" text="Forested Equator" onAction="#onRadioButtonClicked"/>
+            <RadioButton fx:id="poisonedFruitRadioButton" text="Poisoned Fruit" onAction="#onRadioButtonClicked"/>
+            <Label text="Choose an option:"/>
+            <RadioButton fx:id="normalNextGenButton" text="Complete Predestination" onAction="#onRadioButtonClickedGen"/>
+            <RadioButton fx:id="madnessNextGenButton" text="Bit of madness" onAction="#onRadioButtonClickedGen"/>
+        </VBox>
     </center>
 
     <left>

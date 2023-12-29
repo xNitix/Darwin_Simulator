@@ -5,7 +5,7 @@ import agh.ics.oop.model.util.MapVisualizer;
 
 import java.util.*;
 
-public abstract class AbstractWorldMap implements WorldMap {
+public abstract class AbstractWorldMap  {
 /*
     protected final Map<Vector2d, SamePositionAnimals> animals = new HashMap<>();
 

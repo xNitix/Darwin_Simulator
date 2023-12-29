@@ -31,7 +31,7 @@ public class Simulation implements Runnable{
     private volatile boolean isPaused = false; // Flaga do zatrzymywania/wznawiania symulacji
 
 
-    public Simulation(List<Vector2d> initialPositions, GrassField map, int genNumber, int startEnergy, int energyCost, int plantPerDay, int plantEnergy, int reproduceEnergyRequired, int reproduceEnergyLost, int minMutations, int maxMutations){
+    public Simulation(List<Vector2d> initialPositions, GrassField map, int genNumber, int startEnergy, int energyCost, int plantPerDay, int plantEnergy, int reproduceEnergyRequired, int reproduceEnergyLost, int minMutations, int maxMutations, Boolean isSpecialGen){
         this.plantEnergy = plantEnergy;
         List<Animal> animals = new ArrayList<>();
         this.energyCost = energyCost;
@@ -43,7 +43,7 @@ public class Simulation implements Runnable{
         this.genNumber = genNumber;
         for(Vector2d position : initialPositions){
             int[] genes = GenoType.createRandomGenoType(genNumber);
-            Animal currAnimal = new Animal(position,genes,startEnergy,map);
+            Animal currAnimal = new Animal(position,genes,startEnergy,map, isSpecialGen);
             map.place(currAnimal);
             animals.add(currAnimal);
 

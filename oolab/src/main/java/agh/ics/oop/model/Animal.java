@@ -6,6 +6,9 @@ public class Animal implements WorldElement{
     private MapDirection currentOrientation;
     private Vector2d position;
 
+    private double randomFactor = 1.0;
+    private Random random = new Random();
+
     public int[] getGenoType() {
         return genoType;
     }
@@ -33,9 +36,12 @@ public class Animal implements WorldElement{
 
     private int childNumber = 0;
 
+    private Boolean madness;
 
-    public Animal(Vector2d position, int[] genoType, int currentEnergy, GrassField map)
+
+    public Animal(Vector2d position, int[] genoType, int currentEnergy, GrassField map, Boolean madness)
     {
+        this.madness = madness;
         Random random = new Random();
         this.position = position;
         this.currentOrientation = MapDirection.NORTH;
@@ -44,6 +50,10 @@ public class Animal implements WorldElement{
         this.startEnergy = currentEnergy;
         this.map = map;
         this.whichGen = random.nextInt(8);
+        if(madness){
+            addSomeMadness();
+            System.out.println("dodano madness");
+        }
     }
 
 
@@ -72,10 +82,14 @@ public class Animal implements WorldElement{
             this.position = newPosition;
         }
         currentEnergy += energyCost;
-        whichGen++;
         dayAlive++;
-        System.out.println(getCurrentEnergy());
+        //System.out.println(getCurrentEnergy());
 
+        if (random.nextDouble() <= randomFactor) {
+            whichGen++;
+        } else {
+            whichGen = random.nextInt(genoType.length); // Aktywacja losowego genu
+        }
 
 
         /*
@@ -86,9 +100,18 @@ public class Animal implements WorldElement{
          */
     }
 
-    public void animalEat(int energy){
-        currentEnergy += energy;
+    public void addSomeMadness() {
+        randomFactor = 0.8; // Ustawienie 80% szans na standardową aktywację, 20% szans na losowy gen
     }
+
+    public void animalEat(int energy, WorldElement grass){
+        if (grass instanceof Grass) {
+            currentEnergy += energy;
+        } else if (grass instanceof BadGrass) {
+            currentEnergy -= energy;
+        }
+    }
+
 
 
     public String toString() {

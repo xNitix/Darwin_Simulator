@@ -22,7 +22,7 @@ public class SamePositionAnimals implements WorldElement {
         this.map = map;
     }
 
-    public void addAnimal(Animal animal){
+    public synchronized void addAnimal(Animal animal){
         int flag = 0;
         for(Animal animalc : animals){
             if (animalc.equals(animal)) {
@@ -36,7 +36,7 @@ public class SamePositionAnimals implements WorldElement {
 
     }
 
-    public void removeAnimal(Animal animalToRemove) {
+    public synchronized void removeAnimal(Animal animalToRemove) {
         animals.remove(animalToRemove);
     }
 

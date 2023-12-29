@@ -4,27 +4,24 @@ import agh.ics.oop.model.util.MapVisualizer;
 
 import java.util.*;
 
+import static agh.ics.oop.model.MapDirection.randomDirection;
+
 public class GrassField {
     private final Map<Vector2d, FieldType> fieldTypes = new HashMap<>();
 
     protected final Map<Vector2d, SamePositionAnimals> animals = new HashMap<>();
-    private final Map<Vector2d, Grass> grasses = Collections.synchronizedMap(new HashMap<>());
+    private final Map<Vector2d, WorldElement> grasses = Collections.synchronizedMap(new HashMap<>());
 
     public ArrayList<Animal> animalsObj = new ArrayList<>();
-    private final List<Grass> grassesObj = Collections.synchronizedList(new ArrayList<>());
-
-    public Map<Vector2d, Grass> getGrasses() {
-        return grasses;
-    }
+    private final List<WorldElement> grassesObj = Collections.synchronizedList(new ArrayList<>());
     private final Vector2d leftDownGrass;
     private final Vector2d rightUpGrass;
-
     protected List<MapChangeListener> listeners = new ArrayList<>();
-
     protected final MapVisualizer mapVisualizer = new MapVisualizer(this);
-
     protected final UUID id = UUID.randomUUID();
 
+    private final Boolean isSpecial;
+    private final Boolean isSpecialGen;
     public synchronized ArrayList<Animal> getAnimalsObj() {
         return animalsObj;
     }
@@ -92,18 +89,22 @@ public class GrassField {
 
     }
 
-
-
     @Override
     public String toString() {
         Boundary boundary = getCurrentBounds();
         return mapVisualizer.draw(boundary.leftDown(),boundary.rightUp());
     }
 
-    public GrassField(int grassFilesQuantity, int width, int height) {
+    public GrassField(int grassFilesQuantity, int width, int height, Boolean isSpecial, Boolean isSpecialGen) {
+        this.isSpecial = isSpecial;
+        this.isSpecialGen = isSpecialGen;
         leftDownGrass = new Vector2d(0,0);
         rightUpGrass = new Vector2d(width-1,height-1);
-        initializeFieldTypes();
+        if(isSpecial){
+            initializeSpecialFieldTypes();
+        } else {
+            initializeFieldTypes();
+        }
         makeGrassMap(grassFilesQuantity);
     }
 
@@ -153,6 +154,34 @@ public class GrassField {
         return Math.exp(-Math.pow(normalizedDistance, 2) / (2 * Math.pow(standardDeviation, 2)));
     }
 
+    private void initializeSpecialFieldTypes() {
+        Random random = new Random();
+        double targetPreferredFieldsRatio = 0.2;
+
+        int totalFields = (rightUpGrass.getX() - leftDownGrass.getX() + 1) * (rightUpGrass.getY() - leftDownGrass.getY() + 1);
+        int targetPreferredFields = (int) (totalFields * targetPreferredFieldsRatio);
+
+        int sideLength = (int) Math.sqrt(targetPreferredFields);
+        int startX = leftDownGrass.getX() + random.nextInt(rightUpGrass.getX() - sideLength + 1);
+        int startY = leftDownGrass.getY() + random.nextInt(rightUpGrass.getY() - sideLength + 1);
+
+        for (int x = startX; x < startX + sideLength; x++) {
+            for (int y = startY; y < startY + sideLength; y++) {
+                Vector2d position = new Vector2d(x, y);
+                fieldTypes.put(position, FieldType.PREFERRED);
+            }
+        }
+
+        for (int x = leftDownGrass.getX(); x <= rightUpGrass.getX(); x++) {
+            for (int y = leftDownGrass.getY(); y <= rightUpGrass.getY(); y++) {
+                Vector2d position = new Vector2d(x, y);
+                if (!fieldTypes.containsKey(position)) {
+                    fieldTypes.put(position, FieldType.UNATTRACTIVE);
+                }
+            }
+        }
+    }
+
 
     public void makeGrassMap(int quantity){
         int addedGrass = 0;
@@ -165,20 +194,40 @@ public class GrassField {
             double grassProbability = Math.random();
 
             Vector2d newPosition;
+            boolean isNewFieldPrefered = false;
             if(grassProbability <= 0.8 && !preferredPositions.isEmpty() && !unattractivePositions.isEmpty()) {
                 newPosition = preferredPositions.remove(0);
+                isNewFieldPrefered = true;
             } else if(grassProbability > 0.8 && !preferredPositions.isEmpty() && !unattractivePositions.isEmpty()) {
                 newPosition = unattractivePositions.remove(0);
             } else if(!unattractivePositions.isEmpty()) {
                 newPosition = unattractivePositions.remove(0);
             } else {
                 newPosition = preferredPositions.remove(0);
+                isNewFieldPrefered = true;
             }
 
-            Grass newGrass = new Grass(newPosition);
-            grasses.put(newPosition, newGrass);
-            grassesObj.add(newGrass);
-            addedGrass++;
+            if(isSpecial && isNewFieldPrefered){
+                Random random = new Random();
+                double chance = random.nextDouble();
+
+                if (chance < 0.25) {
+                    BadGrass newGrass = new BadGrass(newPosition);
+                    grasses.put(newPosition, newGrass);
+                    grassesObj.add(newGrass);
+                    addedGrass++;
+                } else {
+                    Grass newGrass = new Grass(newPosition);
+                    grasses.put(newPosition, newGrass);
+                    grassesObj.add(newGrass);
+                    addedGrass++;
+                }
+            } else {
+                Grass newGrass = new Grass(newPosition);
+                grasses.put(newPosition, newGrass);
+                grassesObj.add(newGrass);
+                addedGrass++;
+            }
         }
     }
 
@@ -198,6 +247,20 @@ public class GrassField {
         Vector2d oldPosition = animal.getPosition();
         Vector2d newPosition = generateNewPosition(oldPosition,newDirection);
 
+        if (grasses.get(newPosition) != null && grasses.get(newPosition) instanceof BadGrass) {
+            if (dashBadGrass()) {
+                System.out.println("Dash BadGrass!!!");
+                Vector2d newPosition2;
+                do {
+                    newPosition2 = randomDirection().toUnitVector().add(oldPosition);
+                    if (newPosition2.equals(newPosition)) {
+                        newPosition2 = randomDirection().toUnitVector().add(oldPosition);
+                    }
+                } while (newPosition2.equals(newPosition));
+                newPosition = newPosition2;
+            }
+        }
+
         animal.move(energyCost, newPosition);
         if (!oldPosition.equals(animal.getPosition())) {
             SamePositionAnimals oldPositionAnimals = animals.get(oldPosition);
@@ -215,6 +278,12 @@ public class GrassField {
         }else{
             mapChanged("animal in position: " + oldPosition + " changed its orientation to: " + animal.getCurrentOrientation());
         }
+    }
+
+    private boolean dashBadGrass() {
+        Random random = new Random();
+        double chance = random.nextDouble();
+        return chance < 0.2;
     }
 
     private Vector2d generateNewPosition(Vector2d position, MapDirection direction) {
@@ -287,8 +356,8 @@ public class GrassField {
             }
         }
 
-        List<Grass> copyOfGrasses = new ArrayList<>(grassesObj);
-        for (Grass grass : copyOfGrasses) {
+        List<WorldElement> copyOfGrasses = new ArrayList<>(grassesObj);
+        for (WorldElement grass : copyOfGrasses) {
             if (grass.getPosition().equals(position)) {
                 return grass;
             }
@@ -301,7 +370,7 @@ public class GrassField {
 
         for (Vector2d position : grassPositions) {
             SamePositionAnimals samePositionAnimals = animals.get(position);
-            Grass grassAtPosition = grasses.get(position);
+            WorldElement grassAtPosition = grasses.get(position);
 
             if (samePositionAnimals != null && grassAtPosition != null && !samePositionAnimals.getAnimals().isEmpty()) {
                 List<Animal> animalsAtPosition = samePositionAnimals.getAnimals();
@@ -309,7 +378,7 @@ public class GrassField {
                     Animal strongestAnimal = samePositionAnimals.getRandomStrongest();
                     grasses.remove(position);
                     grassesObj.remove(grassAtPosition);
-                    strongestAnimal.animalEat(energy);
+                    strongestAnimal.animalEat(energy,grassAtPosition);
                 }
             }
         }
@@ -356,15 +425,15 @@ public class GrassField {
                         //System.out.println("if4");
                         int[] childGenType = GenoType.combineGenoType(genNumber, animal1, animal2, minMutations, maxMutations);
                         //System.out.println("if5");
-                        animal1.animalEat(-reproduceCost);
-                        animal2.animalEat(-reproduceCost);
+                        Grass grassForNormalEat = new Grass(new Vector2d(2,2));
+                        animal1.animalEat(-reproduceCost,grassForNormalEat);
+                        animal2.animalEat(-reproduceCost,grassForNormalEat);
                         //System.out.println("if10");
-                        Animal child = new Animal(animal1.getPosition(), childGenType, 2 * reproduceCost, this);
+                        Animal child = new Animal(animal1.getPosition(), childGenType, 2 * reproduceCost, this, isSpecialGen);
                         //System.out.println("if11");
                         place(child);
                         //System.out.println("if12");
                         System.out.println(animalsObj.size() + "przed rozmnozeniem");
-                        animalsObj.add(child);
                         System.out.println(animalsObj.size() + "po rozmnozeniu");
                         childs.add(child);
                         //System.out.println("if13");
