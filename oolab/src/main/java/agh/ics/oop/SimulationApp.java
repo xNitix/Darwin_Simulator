@@ -65,8 +65,12 @@ public class SimulationApp extends Application {
             Button resetButton = new Button("Reset");
             resetButton.setOnAction(e -> controller.onResumeSimulation());
 
+            VBox legendContainer = new VBox();
+            controller.setLegendContainer(legendContainer);
+            controller.createLegend();
+
             // Dodanie statystyk i przycisków do lewego kontenera
-            leftContent.getChildren().addAll(animalCountLabel, plantCountLabel, freeFieldCountLabel, mostFamounsGenoTypeLabel, liveAnimalsAvgEnergyLabel, deadAniamlsDaysAlivedLabel, liveAnimalsChildAvgLabel, pauseButton, resetButton, lineChart);
+            leftContent.getChildren().addAll(animalCountLabel, plantCountLabel, freeFieldCountLabel, mostFamounsGenoTypeLabel, liveAnimalsAvgEnergyLabel, deadAniamlsDaysAlivedLabel, liveAnimalsChildAvgLabel, legendContainer, lineChart, pauseButton, resetButton);
 
             // Dodanie lewego kontenera i mapy do głównego kontenera
             simulationContent.getChildren().addAll(leftContent, mapGrid);
@@ -111,7 +115,7 @@ public class SimulationApp extends Application {
                 parametersTab.setContent(parametersContent);
                 tabPane.getTabs().add(parametersTab);
 
-                Scene scene = new Scene(new BorderPane(tabPane), 800, 750);
+                Scene scene = new Scene(new BorderPane(tabPane), 800, 900);
                 primaryStage.setScene(scene);
             } catch (IOException e) {
                 e.printStackTrace();

@@ -161,6 +161,13 @@ public class SimulationPresenter implements MapChangeListener {
     private Map<Integer, Integer> animalCountData = new HashMap<>();
     private Map<Integer, Integer> plantCountData = new HashMap<>();
 
+    public void setLegendContainer(VBox legendContainer) {
+        this.legendContainer = legendContainer;
+    }
+
+    @FXML
+    private VBox legendContainer;
+
     public void setLineChart(LineChart<Number, Number> lineChart) {
         this.lineChart = lineChart;
 
@@ -466,6 +473,44 @@ public class SimulationPresenter implements MapChangeListener {
         // Aktualizacja danych w istniejących seriach
         animalCountSeries.getData().add(new XYChart.Data<>(days, animalCount));
         plantCountSeries.getData().add(new XYChart.Data<>(days, plantCount));
+
+    }
+
+    public void createLegend() {
+        Rectangle jungleRectangle = new Rectangle(30, 30);
+        jungleRectangle.setFill(Color.GREEN);
+        Label jungleLabel = new Label("Jungle");
+        HBox jungleEntryBox = new HBox(jungleRectangle, jungleLabel);
+        jungleEntryBox.setSpacing(5);
+        legendContainer.getChildren().add(jungleEntryBox);
+
+        Rectangle stepRectangle = new Rectangle(30, 30);
+        stepRectangle.setFill(Color.rgb(215, 255, 190));
+        Label stepLabel = new Label("Step");
+        HBox stepEntryBox = new HBox(stepRectangle, stepLabel);
+        stepEntryBox.setSpacing(5);
+        legendContainer.getChildren().add(stepEntryBox);
+
+        Map<Image, String> legendData = new LinkedHashMap<>();
+        legendData.put(blackCat, "Above 80% energy");
+        legendData.put(grayCat, "60% - 80% energy");
+        legendData.put(redCat, "40% - 60% energy");
+        legendData.put(orangekCat, "20% - 40% energy");
+        legendData.put(yellowCat, "Below 20% energy");
+        legendData.put(goodPlant, "Plant");
+        if(isSpecial){
+            legendData.put(badPlant, "Poisonous plant");
+        }
+
+        for (Map.Entry<Image, String> entry : legendData.entrySet()) {
+            ImageView imageView = new ImageView(entry.getKey());
+            imageView.setFitWidth(30);
+            imageView.setFitHeight(30);
+            Label label = new Label(entry.getValue());
+            HBox entryBox = new HBox(imageView, label);
+            entryBox.setSpacing(5);
+            legendContainer.getChildren().add(entryBox);
+        }
 
     }
 
