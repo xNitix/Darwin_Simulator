@@ -112,6 +112,10 @@ public class Animal implements WorldElement{
         }
     }
 
+    public void animalNewChild(){
+        childNumber +=1;
+    }
+
 
 
     public String toString() {

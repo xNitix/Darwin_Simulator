@@ -8,7 +8,7 @@ import java.util.Random;
 public class SamePositionAnimals implements WorldElement {
     private final Vector2d position;
 
-    public List<Animal> getAnimals() {
+    public synchronized List<Animal> getAnimals() {
         return animals;
     }
 
@@ -54,7 +54,7 @@ public class SamePositionAnimals implements WorldElement {
         return position;
     }
 
-    public ArrayList<Animal> findStrongestAnimals() {
+    public synchronized ArrayList<Animal> findStrongestAnimals() {
         ArrayList<Animal> strongestAnimals = new ArrayList<>();
         int mostEnergy = 0;
         int mostDays = 0;

@@ -13,6 +13,11 @@ public class GrassField {
     private final Map<Vector2d, WorldElement> grasses = Collections.synchronizedMap(new HashMap<>());
 
     public ArrayList<Animal> animalsObj = new ArrayList<>();
+
+    public List<WorldElement> getGrassesObj() {
+        return grassesObj;
+    }
+
     private final List<WorldElement> grassesObj = Collections.synchronizedList(new ArrayList<>());
     private final Vector2d leftDownGrass;
     private final Vector2d rightUpGrass;
@@ -25,6 +30,12 @@ public class GrassField {
     public synchronized ArrayList<Animal> getAnimalsObj() {
         return animalsObj;
     }
+
+    public Map<int[], Integer> getMapGenotypes() {
+        return mapGenotypes;
+    }
+
+    public Map<int[],Integer> mapGenotypes = new HashMap<>();
 
 
 
@@ -49,6 +60,7 @@ public class GrassField {
         addAnimalToMap(animal, animal.getPosition());
         mapChanged("animal placed : " + animal.getPosition());
         animalsObj.add(animal);
+        addGenotype(animal.getGenoType());
         //} else {
         //    throw new PositionAlreadyOccupiedException(animal.getPosition());
         //}
@@ -339,6 +351,19 @@ public class GrassField {
         return free;
     }
 
+    public ArrayList<Vector2d> freePosition(){
+        ArrayList<Vector2d> free = new ArrayList<>();
+
+        for (Map.Entry<Vector2d, FieldType> entry : fieldTypes.entrySet()) {
+            Vector2d position = entry.getKey();
+            if (!grasses.containsKey(position) && !animals.containsKey(position)) {
+                free.add(position);
+            }
+        }
+
+        return free;
+    }
+
     public WorldElement objectAt(Vector2d position) {
         List<Animal> copyOfAnimals = new ArrayList<>(animalsObj);
         for (Animal animal : copyOfAnimals) {
@@ -424,6 +449,9 @@ public class GrassField {
                     if(animal1.getCurrentEnergy() >= energyRequired && animal2.getCurrentEnergy() >= energyRequired) {
                         //System.out.println("if4");
                         int[] childGenType = GenoType.combineGenoType(genNumber, animal1, animal2, minMutations, maxMutations);
+                        addGenotype(childGenType);
+                        animal1.animalNewChild();
+                        animal2.animalNewChild();
                         //System.out.println("if5");
                         Grass grassForNormalEat = new Grass(new Vector2d(2,2));
                         animal1.animalEat(-reproduceCost,grassForNormalEat);
@@ -442,6 +470,20 @@ public class GrassField {
             }
         }
         return childs;
+    }
+
+    private void addGenotype(int[] newGenotype) {
+        for (Map.Entry<int[],Integer> entry: mapGenotypes.entrySet()) {
+            int[] key = entry.getKey();
+            Integer value = entry.getValue();
+
+            if (Arrays.equals(key, newGenotype)) {
+                mapGenotypes.put(key,value+1);
+                mapGenotypes.remove(key,value);
+                return;
+            }
+        }
+        mapGenotypes.put(newGenotype,1);
     }
 
 }

@@ -9,6 +9,11 @@ import java.util.*;
 public class Simulation implements Runnable{
 
     private List<Animal> animals;
+
+    public List<Animal> getDeadAnimals() {
+        return deadAnimals;
+    }
+
     private List<Animal> deadAnimals = new ArrayList<>();
 
     private GrassField map;
@@ -27,6 +32,12 @@ public class Simulation implements Runnable{
     private int minMutations;
 
     private int genNumber;
+
+    private int day=0;
+
+    public int getDay() {
+        return day;
+    }
 
     private volatile boolean isPaused = false; // Flaga do zatrzymywania/wznawiania symulacji
 
@@ -72,6 +83,7 @@ public class Simulation implements Runnable{
                 animalsReproduce();
                 map.makeGrassMap(plantPerDay);
                 //System.out.println("tu6");
+                day++;
                 try {
                     Thread.sleep(1000); // Opóźnienie 1 sekunda między kolejnymi aktualizacjami
                 } catch (InterruptedException e) {
@@ -147,7 +159,5 @@ public class Simulation implements Runnable{
         List<Animal> newAnimals = map.reproduce(genNumber,minMutations,maxMutations,reproduceEnergyLost,reproduceEnergyRequired);
         animals.addAll(newAnimals);
     }
-
-
 
 }

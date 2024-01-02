@@ -6,6 +6,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -15,32 +17,12 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class SimulationApp extends Application {
+
+    private BorderPane viewRoot;
+
     public void start(Stage primaryStage) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("simulation.fxml"));
-            BorderPane root = loader.load();
-            SimulationPresenter controller = loader.getController();
-
-            // Inicjalizacja SimulationPresenter
-            controller.initialize(); // Możesz dodać swoją logikę inicjalizacji, jeśli taka jest potrzebna
-
-            TabPane tabPane = new TabPane();
-            Tab parametersTab = new Tab("Parameters");
-            VBox parametersContent = new VBox();
-
-            Button startButton = getButton(controller, tabPane);
-
-            parametersContent.getChildren().addAll(root, startButton);
-            parametersTab.setContent(parametersContent);
-            tabPane.getTabs().add(parametersTab);
-
-            Scene scene = new Scene(new BorderPane(tabPane), 800, 600);
-            primaryStage.setScene(scene);
-            primaryStage.setTitle("Simulation App");
-            primaryStage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        configureStage(primaryStage, viewRoot);
+        primaryStage.show();
     }
 
     private static Button getButton(SimulationPresenter controller, TabPane tabPane) {
@@ -59,12 +41,24 @@ public class SimulationApp extends Application {
             controller.setMapGrid(mapGrid);
 
             Label animalCountLabel = new Label();
-            Label daysAliveLabel = new Label();
+            Label plantCountLabel = new Label();
+            Label freeFieldCountLabel = new Label();
+            Label mostFamounsGenoTypeLabel = new Label();
+            Label liveAnimalsAvgEnergyLabel = new Label();
+            Label deadAniamlsDaysAlivedLabel = new Label();
+            Label liveAnimalsChildAvgLabel = new Label();
 
+            LineChart<Number, Number> lineChart = new LineChart<>(new NumberAxis(), new NumberAxis());
+
+            controller.setLineChart(lineChart);
             controller.setAnimalCountLabel(animalCountLabel);
-            controller.setDaysAliveLabel(daysAliveLabel);
+            controller.setDeadAniamlsDaysAlivedLabel(deadAniamlsDaysAlivedLabel);
+            controller.setPlantCountLabel(plantCountLabel);
+            controller.setFreeFieldCountLabel(freeFieldCountLabel);
+            controller.setMostFamounsGenoTypeLabel(mostFamounsGenoTypeLabel);
+            controller.setLiveAnimalsAvgEnergyLabel(liveAnimalsAvgEnergyLabel);
+            controller.setLiveAnimalsChildAvgLabel(liveAnimalsChildAvgLabel);
 
-            // Dodanie przycisków
             Button pauseButton = new Button("Pause");
             pauseButton.setOnAction(e -> controller.onPauseSimulation());
 
@@ -72,17 +66,14 @@ public class SimulationApp extends Application {
             resetButton.setOnAction(e -> controller.onResumeSimulation());
 
             // Dodanie statystyk i przycisków do lewego kontenera
-            leftContent.getChildren().addAll(animalCountLabel, daysAliveLabel, pauseButton, resetButton);
+            leftContent.getChildren().addAll(animalCountLabel, plantCountLabel, freeFieldCountLabel, mostFamounsGenoTypeLabel, liveAnimalsAvgEnergyLabel, deadAniamlsDaysAlivedLabel, liveAnimalsChildAvgLabel, pauseButton, resetButton, lineChart);
 
             // Dodanie lewego kontenera i mapy do głównego kontenera
             simulationContent.getChildren().addAll(leftContent, mapGrid);
 
-            // Ustawienie właściwości HBox
-            HBox.setHgrow(mapGrid, Priority.ALWAYS); // Mapa będzie się rozciągać, aby wypełnić dostępną przestrzeń
-
             // Ustawienie właściwości VBox
             leftContent.setAlignment(Pos.TOP_LEFT); // Statystyki i przyciski będą na górze po lewej stronie
-            leftContent.setSpacing(10); // Dodanie odstępu między elementami
+            leftContent.setSpacing(20); // Dodanie odstępu między elementami
 
             simulationTab.setContent(simulationContent);
             tabPane.getTabs().add(simulationTab);
@@ -96,9 +87,38 @@ public class SimulationApp extends Application {
 
 
     private void configureStage(Stage primaryStage, BorderPane viewRoot) {
-        var scene = new Scene(viewRoot);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Simulation app");
+        if (viewRoot == null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("simulation.fxml"));
+                viewRoot = loader.load();
+                SimulationPresenter controller = loader.getController();
+                controller.initialize();
+
+                TabPane tabPane = new TabPane();
+                Tab parametersTab = new Tab("Parameters");
+                VBox parametersContent = new VBox(10);
+
+                parametersContent.getChildren().add(viewRoot);
+
+                Button startButton = getButton(controller, tabPane);
+                startButton.setMaxWidth(200);
+
+                HBox buttonContainer = new HBox();
+                buttonContainer.getChildren().add(startButton);
+                buttonContainer.setAlignment(Pos.CENTER);
+
+                parametersContent.getChildren().addAll(new Label(), buttonContainer);
+                parametersTab.setContent(parametersContent);
+                tabPane.getTabs().add(parametersTab);
+
+                Scene scene = new Scene(new BorderPane(tabPane), 800, 750);
+                primaryStage.setScene(scene);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        primaryStage.setTitle("Simulation App");
         primaryStage.minWidthProperty().bind(viewRoot.minWidthProperty());
         primaryStage.minHeightProperty().bind(viewRoot.minHeightProperty());
     }

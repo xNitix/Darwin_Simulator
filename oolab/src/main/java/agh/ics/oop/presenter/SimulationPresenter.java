@@ -6,6 +6,8 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -14,10 +16,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -56,7 +57,7 @@ public class SimulationPresenter implements MapChangeListener {
     @FXML
     private TextField widthField;
     @FXML
-    private Spinner genNumber;
+    private TextField genNumberField;
     @FXML
     private Label description;
 
@@ -88,6 +89,8 @@ public class SimulationPresenter implements MapChangeListener {
     private Boolean isSpecial = false;
     private Boolean isSpecialGen = false;
 
+    private int genNumber;
+
     Image blackCat = new Image("file:oolab/src/main/resources/koty/kot1.png");
     Image grayCat = new Image("file:oolab/src/main/resources/koty/kot2.png");
     Image redCat = new Image("file:oolab/src/main/resources/koty/kot3.png");
@@ -96,8 +99,47 @@ public class SimulationPresenter implements MapChangeListener {
     Image goodPlant = new Image("file:oolab/src/main/resources/koty/grass1.png");
     Image badPlant = new Image("file:oolab/src/main/resources/koty/grass2.png");
 
+    public void setStatisticsGrid(GridPane statisticsGrid) {
+        this.statisticsGrid = statisticsGrid;
+    }
+
     @FXML
     private GridPane statisticsGrid;
+
+    public void setPlantCountLabel(Label plantCountLabel) {
+        this.plantCountLabel = plantCountLabel;
+    }
+
+    @FXML
+    private Label plantCountLabel;
+
+    public void setFreeFieldCountLabel(Label freeFieldCountLabel) {
+        this.freeFieldCountLabel = freeFieldCountLabel;
+    }
+
+    @FXML
+    private Label freeFieldCountLabel;
+
+    public void setMostFamounsGenoTypeLabel(Label mostFamounsGenoTypeLabel) {
+        this.mostFamounsGenoTypeLabel = mostFamounsGenoTypeLabel;
+    }
+
+    @FXML
+    private Label mostFamounsGenoTypeLabel;
+
+    public void setLiveAnimalsAvgEnergyLabel(Label liveAnimalsAvgEnergy) {
+        this.liveAnimalsAvgEnergyLabel = liveAnimalsAvgEnergy;
+    }
+
+    @FXML
+    private Label liveAnimalsAvgEnergyLabel;
+
+    public void setLiveAnimalsChildAvgLabel(Label liveAnimalsChildAvg) {
+        this.liveAnimalsChildAvgLabel = liveAnimalsChildAvg;
+    }
+
+    @FXML
+    private Label liveAnimalsChildAvgLabel;
 
     public void setAnimalCountLabel(Label animalCountLabel) {
         this.animalCountLabel = animalCountLabel;
@@ -106,13 +148,39 @@ public class SimulationPresenter implements MapChangeListener {
     @FXML
     private Label animalCountLabel;
 
-    public void setDaysAliveLabel(Label daysAliveLabel) {
+    public void setDeadAniamlsDaysAlivedLabel(Label daysAliveLabel) {
         this.daysAliveLabel = daysAliveLabel;
     }
 
     @FXML
     private Label daysAliveLabel;
     private SimulationStatistics statistics; // Referencja do obiektu SimulationStatistics
+
+    @FXML
+    private LineChart<Number, Number> lineChart;
+    private Map<Integer, Integer> animalCountData = new HashMap<>();
+    private Map<Integer, Integer> plantCountData = new HashMap<>();
+
+    public void setLineChart(LineChart<Number, Number> lineChart) {
+        this.lineChart = lineChart;
+
+        lineChart.setPrefWidth(400); //szerokość
+        lineChart.setPrefHeight(300); //wysokość
+
+        // Inicjalizacja serii danych dla ilości zwierząt
+        XYChart.Series<Number, Number> animalCountSeries = new XYChart.Series<>();
+        animalCountSeries.setName("Animal Count");
+
+        // Inicjalizacja serii danych dla ilości roslin
+        XYChart.Series<Number, Number> plantCountSeries = new XYChart.Series<>();
+        plantCountSeries.setName("Plant Count");
+
+        lineChart.getData().addAll(animalCountSeries, plantCountSeries);
+
+        lineChart.getXAxis().setLabel("Day");
+        lineChart.getYAxis().setLabel("Count");
+
+    }
 
 
 
@@ -243,18 +311,19 @@ public class SimulationPresenter implements MapChangeListener {
             reproduceEnergyLost = Integer.parseInt(reproduceEnergyLostField.getText());
             minMutations = Integer.parseInt(minMutationsField.getText());
             maxMutations = Integer.parseInt(maxMutationsField.getText());
+            genNumber = Integer.parseInt(genNumberField.getText());
             cellSize=cellSize/width+30;
 
             if (width <= 0 || height <= 0 || grassQuantity < 0 || startEnergy < 0) {
 
             } else {
                 GrassField map = new GrassField(grassQuantity, width, height, isSpecial, isSpecialGen);
-                statistics = new SimulationStatistics(map);
                 map.subscribe(this);
                 setWorldMap(map);
 
                 List<Vector2d> positions = generateStartPositions();
-                Simulation simulation = new Simulation(positions, worldMap, (Integer) genNumber.getValue(), startEnergy, moveCost, plantPerDay, energyForGrass, reproduceEnergy, reproduceEnergyLost, minMutations, maxMutations, isSpecialGen);
+                Simulation simulation = new Simulation(positions, worldMap, genNumber, startEnergy, moveCost, plantPerDay, energyForGrass, reproduceEnergy, reproduceEnergyLost, minMutations, maxMutations, isSpecialGen);
+                statistics = new SimulationStatistics(map,simulation);
 
                 SimulationEngine simulationEngine = new SimulationEngine(Arrays.asList(simulation), 4);
                 this.simulationEngine = simulationEngine;
@@ -307,9 +376,8 @@ public class SimulationPresenter implements MapChangeListener {
             }
         });
 
-        // Ustawienie wartości domyślnej dla Spinnera genNumber
-        genNumber.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 10)); // zakres od 0 do oo, wartość domyślna 5
         animalNumber.setText("3");
+        genNumberField.setText("5");
         startEnergyField.setText("15");
         widthField.setText("5");
         heightField.setText("5");
@@ -364,13 +432,41 @@ public class SimulationPresenter implements MapChangeListener {
 
         int animalCount = statistics.getNumberOfInsistingAnimals();
         double daysAlive = statistics.getAvgDaysAlive();
+        int plantCount = statistics.getPlantsCount();
+        int freeFieldsCount = statistics.getFreeFieldsCount();
+        double liveAnimalsAvgEnergy = statistics.getLiveAnimalsAvgEnergy();
+        double liveAnimalsChildAvg = statistics.getAliveAnimalsChildAvg();
+        int[] mostFamousGenoType = statistics.getDominantGenoType();
 
         animalCountLabel.setText("Animal Count: " + animalCount);
-        daysAliveLabel.setText("Average life length: " + daysAlive);
+        plantCountLabel.setText("Plant Count: " + plantCount);
+        daysAliveLabel.setText("Average Dead Animals Life Length: " + daysAlive);
+        freeFieldCountLabel.setText("Free Fields Count: " + freeFieldsCount);
+        liveAnimalsAvgEnergyLabel.setText("Alive Animals AVG Energy: " + liveAnimalsAvgEnergy);
+        liveAnimalsChildAvgLabel.setText("Alive Animals Child AVG: " + liveAnimalsChildAvg);
+        mostFamounsGenoTypeLabel.setText("Famous Genotype: " + Arrays.toString(mostFamousGenoType));
+        updateChart();
     }
     public SimulationStatistics getSimulationStatistics() {
         return statistics;
     }
 
+    public void updateChart() {
+        int animalCount = statistics.getAnimalCount();
+        int plantCount = statistics.getPlantsCount();
+        int days = statistics.getDay();
+
+        // Dodanie aktualnych danych do map
+        animalCountData.put(days, animalCount);
+        plantCountData.put(days, plantCount);
+
+        XYChart.Series<Number, Number> animalCountSeries = lineChart.getData().get(0);
+        XYChart.Series<Number, Number> plantCountSeries = lineChart.getData().get(1);
+
+        // Aktualizacja danych w istniejących seriach
+        animalCountSeries.getData().add(new XYChart.Data<>(days, animalCount));
+        plantCountSeries.getData().add(new XYChart.Data<>(days, plantCount));
+
+    }
 
 }
