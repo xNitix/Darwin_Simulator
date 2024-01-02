@@ -9,6 +9,7 @@ import javafx.geometry.HPos;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
@@ -167,6 +168,9 @@ public class SimulationPresenter implements MapChangeListener {
 
     @FXML
     private VBox legendContainer;
+
+    @FXML
+    private Button dominantButton;
 
     public void setLineChart(LineChart<Number, Number> lineChart) {
         this.lineChart = lineChart;
@@ -344,12 +348,14 @@ public class SimulationPresenter implements MapChangeListener {
     public void onPauseSimulation() {
         if (simulationEngine != null) {
             simulationEngine.stopAllSimulations();
+            dominantButton.setVisible(true);
         }
     }
 
     public void onResumeSimulation() {
         if (simulationEngine != null) {
             simulationEngine.resumeAllSimulations();
+            dominantButton.setVisible(false);
         }
     }
 
@@ -384,7 +390,7 @@ public class SimulationPresenter implements MapChangeListener {
         });
 
         animalNumber.setText("3");
-        genNumberField.setText("5");
+        genNumberField.setText("3");
         startEnergyField.setText("15");
         widthField.setText("5");
         heightField.setText("5");
@@ -514,4 +520,32 @@ public class SimulationPresenter implements MapChangeListener {
 
     }
 
+    @FXML
+    public void onFollowSimulation() {
+        List<Animal> dominantGenotypeAnimals = statistics.findDominantGenotypeAnimals();
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Dominant Genotype Animals");
+        alert.setHeaderText(null);
+
+        VBox animalsInfo = new VBox();
+        for (Animal animal : dominantGenotypeAnimals) {
+            HBox animalDetails = new HBox();
+
+            Label idLabel = new Label("ID: " + animal.getId());
+            Label positionLabel = new Label("  Position: " + animal.getPosition());
+            Label energyLabel = new Label("  Energy: " + animal.getCurrentEnergy());
+            Label isDeadLabel = new Label(animal.getCurrentEnergy() < 0 ? " (Dead)" : " (Alive)");
+            animalDetails.getChildren().addAll(idLabel, positionLabel, energyLabel, isDeadLabel);
+
+            animalsInfo.getChildren().add(animalDetails);
+        }
+
+        alert.getDialogPane().setContent(animalsInfo);
+        alert.showAndWait();
+    }
+
+    public void setDominantButton(Button dominantButton) {
+        this.dominantButton = dominantButton;
+    }
 }

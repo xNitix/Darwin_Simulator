@@ -4,6 +4,7 @@ import agh.ics.oop.model.Animal;
 import agh.ics.oop.model.GrassField;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -84,5 +85,19 @@ public class SimulationStatistics {
             }
         }
         return genotype;
+    }
+
+    public List<Animal> findDominantGenotypeAnimals() {
+        List<Animal> result = new ArrayList<>();
+        int[] dominantGenoType = getDominantGenoType();
+        List<Animal> animals = grassField.getAnimalsObj();
+        animals.addAll(simulation.getDeadAnimals());
+        for(Animal animal : animals){
+            if(Arrays.equals(animal.getGenoType(), dominantGenoType)){
+
+                result.add(animal);
+            }
+        }
+        return result;
     }
 }

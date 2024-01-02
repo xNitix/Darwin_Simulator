@@ -457,7 +457,7 @@ public class GrassField {
                         animal1.animalEat(-reproduceCost,grassForNormalEat);
                         animal2.animalEat(-reproduceCost,grassForNormalEat);
                         //System.out.println("if10");
-                        Animal child = new Animal(animal1.getPosition(), childGenType, 2 * reproduceCost, this, isSpecialGen);
+                        Animal child = new Animal(animal1.getPosition(), childGenType, 2 * reproduceCost, this, isSpecialGen );
                         //System.out.println("if11");
                         place(child);
                         //System.out.println("if12");

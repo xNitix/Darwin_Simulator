@@ -38,10 +38,20 @@ public class Animal implements WorldElement{
 
     private Boolean madness;
 
+    private static int nextId = 0; // zmienna wspoldzielona (static)
+
+    public int getId() {
+        return id;
+    }
+
+    private final int id;
+
 
     public Animal(Vector2d position, int[] genoType, int currentEnergy, GrassField map, Boolean madness)
     {
         this.madness = madness;
+        this.id = nextId;
+        nextId++;
         Random random = new Random();
         this.position = position;
         this.currentOrientation = MapDirection.NORTH;

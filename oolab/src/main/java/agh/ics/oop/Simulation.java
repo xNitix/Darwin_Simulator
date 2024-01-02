@@ -35,6 +35,8 @@ public class Simulation implements Runnable{
 
     private int day=0;
 
+    private int animalId = 0;
+
     public int getDay() {
         return day;
     }
@@ -54,13 +56,18 @@ public class Simulation implements Runnable{
         this.genNumber = genNumber;
         for(Vector2d position : initialPositions){
             int[] genes = GenoType.createRandomGenoType(genNumber);
-            Animal currAnimal = new Animal(position,genes,startEnergy,map, isSpecialGen);
+            Animal currAnimal = new Animal(position,genes,startEnergy,map,isSpecialGen);
             map.place(currAnimal);
             animals.add(currAnimal);
-
+            animalId++;
         }
         this.animals = animals;
         this.map = map;
+    }
+
+    public int getNewAnimalId(){
+        animalId++;
+        return animalId;
     }
 
 
