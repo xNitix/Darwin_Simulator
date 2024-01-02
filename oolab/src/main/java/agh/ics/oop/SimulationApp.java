@@ -33,11 +33,14 @@ public class SimulationApp extends Application {
 
             // Utworzenie kontenera HBox do przechowywania statystyk, przycisków i mapy
             HBox simulationContent = new HBox();
+            simulationContent.setStyle("-fx-background-image: url('file:oolab/src/main/resources/koty/background.png'); -fx-padding: 30;");
 
             // Utworzenie kontenera VBox do przechowywania statystyk i przycisków
             VBox leftContent = new VBox();
+            leftContent.setStyle("-fx-background-color: white;-fx-border-color: black; -fx-border-width: 3px;-fx-padding: 3;");
 
             GridPane mapGrid = new GridPane();
+            mapGrid.setStyle("-fx-background-color: white;-fx-border-color: black; -fx-border-width: 3px;");
             controller.setMapGrid(mapGrid);
 
             Label animalCountLabel = new Label();
@@ -77,8 +80,10 @@ public class SimulationApp extends Application {
             controller.setLegendContainer(legendContainer);
             controller.createLegend();
 
+            Label statisticsTitle = new Label("Statistics: ");
+            statisticsTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
             // Dodanie statystyk i przycisków do lewego kontenera
-            leftContent.getChildren().addAll(animalCountLabel, plantCountLabel, freeFieldCountLabel, mostFamounsGenoTypeLabel, liveAnimalsAvgEnergyLabel, deadAniamlsDaysAlivedLabel, liveAnimalsChildAvgLabel, legendContainer, lineChart, buttonContainer);
+            leftContent.getChildren().addAll(statisticsTitle, animalCountLabel, plantCountLabel, freeFieldCountLabel, mostFamounsGenoTypeLabel, liveAnimalsAvgEnergyLabel, deadAniamlsDaysAlivedLabel, liveAnimalsChildAvgLabel, legendContainer, lineChart, buttonContainer);
 
             // Dodanie lewego kontenera i mapy do głównego kontenera
             simulationContent.getChildren().addAll(leftContent, mapGrid);
@@ -123,7 +128,7 @@ public class SimulationApp extends Application {
                 parametersTab.setContent(parametersContent);
                 tabPane.getTabs().add(parametersTab);
 
-                Scene scene = new Scene(new BorderPane(tabPane), 800, 900);
+                Scene scene = new Scene(new BorderPane(tabPane), 200, 900);
                 primaryStage.setScene(scene);
             } catch (IOException e) {
                 e.printStackTrace();

@@ -8,7 +8,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            minHeight="550.0" minWidth="1000.0"
+            minHeight="550.0" minWidth="923.0"
             fx:controller="agh.ics.oop.presenter.SimulationPresenter">
     <center>
         <HBox spacing="20" alignment="CENTER">
