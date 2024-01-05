@@ -73,7 +73,10 @@ public class SimulationApp extends Application {
             controller.setDominantButton(dominantButton);
             dominantButton.setOnAction(e -> controller.onFollowSimulation());
 
-            HBox buttonContainer = new HBox(pauseButton, resetButton, dominantButton);
+            Button trackAnimalButton = new Button("Track Animal");
+            trackAnimalButton.setOnAction(e -> controller.ontrackAnimalButton());
+
+            HBox buttonContainer = new HBox(pauseButton, resetButton, dominantButton, trackAnimalButton);
             buttonContainer.setSpacing(10); // Odstęp między przyciskami
 
             VBox legendContainer = new VBox();
@@ -85,14 +88,19 @@ public class SimulationApp extends Application {
             // Dodanie statystyk i przycisków do lewego kontenera
             leftContent.getChildren().addAll(statisticsTitle, animalCountLabel, plantCountLabel, freeFieldCountLabel, mostFamounsGenoTypeLabel, liveAnimalsAvgEnergyLabel, deadAniamlsDaysAlivedLabel, liveAnimalsChildAvgLabel, legendContainer, lineChart, buttonContainer);
 
+            VBox mapAndTrack = new VBox();
+            mapAndTrack.getChildren().addAll(mapGrid);
+            controller.setMapAndTrack(mapAndTrack);
+
             // Dodanie lewego kontenera i mapy do głównego kontenera
-            simulationContent.getChildren().addAll(leftContent, mapGrid);
+            simulationContent.getChildren().addAll(leftContent, mapAndTrack);
 
             // Ustawienie właściwości VBox
             leftContent.setAlignment(Pos.TOP_LEFT); // Statystyki i przyciski będą na górze po lewej stronie
             leftContent.setSpacing(15); // Dodanie odstępu między elementami
 
             simulationTab.setContent(simulationContent);
+
             tabPane.getTabs().add(simulationTab);
             tabPane.getSelectionModel().select(simulationTab);
 

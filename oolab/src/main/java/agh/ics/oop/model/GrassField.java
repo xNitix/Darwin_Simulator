@@ -9,7 +9,7 @@ import static agh.ics.oop.model.MapDirection.randomDirection;
 public class GrassField {
     private final Map<Vector2d, FieldType> fieldTypes = new HashMap<>();
 
-    protected final Map<Vector2d, SamePositionAnimals> animals = new HashMap<>();
+    protected final Map<Vector2d, SamePositionAnimals> animals = Collections.synchronizedMap(new HashMap<>());
     private final Map<Vector2d, WorldElement> grasses = Collections.synchronizedMap(new HashMap<>());
 
     public ArrayList<Animal> animalsObj = new ArrayList<>();
@@ -364,18 +364,16 @@ public class GrassField {
         return free;
     }
 
-    public WorldElement objectAt(Vector2d position) {
+    public synchronized WorldElement objectAt(Vector2d position) {
         List<Animal> copyOfAnimals = new ArrayList<>(animalsObj);
         for (Animal animal : copyOfAnimals) {
             if (animal.getPosition().equals(position)) {
-//              returns strongest animal
-
                 SamePositionAnimals samePositionAnimals = animals.get(animal.getPosition());
                 if(samePositionAnimals != null){
-                    List <Animal> strongestAnimals = animals.get(animal.getPosition()).findStrongestAnimals();
-                    Random random = new Random();
-                    int randomIdx = random.nextInt(strongestAnimals.size());
-                    return strongestAnimals.get(randomIdx);
+                    SamePositionAnimals animalsOnPosition = animals.get(animal.getPosition());
+                    Animal strongestAnimal = animalsOnPosition.getRandomStrongest();
+                    System.out.println(strongestAnimal.getId() + " najmocniejsze na pozycji " + strongestAnimal.getPosition());
+                    return strongestAnimal;
                 }
                 return null;
             }
@@ -415,13 +413,15 @@ public class GrassField {
         SamePositionAnimals samePositionAnimals = animals.get(position);
         if (samePositionAnimals != null) {
             samePositionAnimals.removeAnimal(animalToRemove);
-            animals.remove(position);
-            removeDeadAnimalsFromList();
+            if(samePositionAnimals.isEmpty()){
+                animals.remove(position);
+            }
+            removeDeadAnimalsFromList(animalToRemove);
         }
     }
 
-    public synchronized void removeDeadAnimalsFromList() {
-        animalsObj.removeIf(animal -> animal.getCurrentEnergy() < 0);
+    public synchronized void removeDeadAnimalsFromList(Animal animalToRemove) {
+       animalsObj.remove(animalToRemove);
     }
 
     public synchronized List<Animal> reproduce(int genNumber, int minMutations, int maxMutations, int reproduceCost, int energyRequired) {
@@ -447,15 +447,14 @@ public class GrassField {
                     Animal animal2 = animalsAtPosition.get(1);
                     //System.out.println("if7");
                     if(animal1.getCurrentEnergy() >= energyRequired && animal2.getCurrentEnergy() >= energyRequired) {
-                        //System.out.println("if4");
+                        System.out.println(position);
                         int[] childGenType = GenoType.combineGenoType(genNumber, animal1, animal2, minMutations, maxMutations);
                         addGenotype(childGenType);
                         animal1.animalNewChild();
                         animal2.animalNewChild();
                         //System.out.println("if5");
-                        Grass grassForNormalEat = new Grass(new Vector2d(2,2));
-                        animal1.animalEat(-reproduceCost,grassForNormalEat);
-                        animal2.animalEat(-reproduceCost,grassForNormalEat);
+                        animal1.animalReprodueEnergyLost(reproduceCost);
+                        animal2.animalReprodueEnergyLost(reproduceCost);
                         //System.out.println("if10");
                         Animal child = new Animal(animal1.getPosition(), childGenType, 2 * reproduceCost, this, isSpecialGen );
                         //System.out.println("if11");

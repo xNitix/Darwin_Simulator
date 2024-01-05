@@ -13,6 +13,12 @@ public class SimulationStatistics {
 
     private final Simulation simulation;
 
+    public Animal getSelectedAnimal() {
+        return selectedAnimal;
+    }
+
+    public Animal selectedAnimal = null;
+
     public SimulationStatistics(GrassField grassField, Simulation simulation) {
         this.grassField = grassField;
         this.simulation = simulation;
@@ -90,8 +96,7 @@ public class SimulationStatistics {
     public List<Animal> findDominantGenotypeAnimals() {
         List<Animal> result = new ArrayList<>();
         int[] dominantGenoType = getDominantGenoType();
-        List<Animal> animals = grassField.getAnimalsObj();
-        animals.addAll(simulation.getDeadAnimals());
+        List<Animal> animals = getDeadAndAliveAnimals();
         for(Animal animal : animals){
             if(Arrays.equals(animal.getGenoType(), dominantGenoType)){
 
@@ -99,5 +104,32 @@ public class SimulationStatistics {
             }
         }
         return result;
+    }
+
+    public List<Animal> getDeadAndAliveAnimals(){
+        List<Animal> animals = new ArrayList<>(grassField.getAnimalsObj());
+
+        for (Animal deadAnimal : simulation.getDeadAnimals()) {
+            if (animals.contains(deadAnimal)) {
+                System.out.println(deadAnimal.getId() + " 2 ");
+            } else {
+                System.out.println(deadAnimal.getId() + " 1 ");
+                animals.add(deadAnimal);
+            }
+        }
+
+        return animals;
+    }
+
+    public Animal findSelectedAnimal(int selectedID) {
+        List<Animal> animals = getDeadAndAliveAnimals();
+        for (Animal animal : animals) {
+            if (animal.getId() == selectedID) {
+                selectedAnimal = animal;
+                return animal;
+            }
+        }
+
+        return null;
     }
 }

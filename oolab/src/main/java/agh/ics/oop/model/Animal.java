@@ -13,7 +13,18 @@ public class Animal implements WorldElement{
         return genoType;
     }
     private final int[] genoType;
-    private int whichGen;
+
+    public int getWhichGen() {
+        return whichGen;
+    }
+
+    public int whichGen;
+
+    public int getGrassEatenCounter() {
+        return grassEatenCounter;
+    }
+
+    public int grassEatenCounter = 0;
     private final int startEnergy;
 
     private final GrassField map;
@@ -38,6 +49,12 @@ public class Animal implements WorldElement{
 
     private Boolean madness;
 
+    public int getDeathDay() {
+        return deathDay;
+    }
+
+    public int deathDay = -1;
+
     private static int nextId = 0; // zmienna wspoldzielona (static)
 
     public int getId() {
@@ -59,7 +76,7 @@ public class Animal implements WorldElement{
         this.currentEnergy = currentEnergy;
         this.startEnergy = currentEnergy;
         this.map = map;
-        this.whichGen = random.nextInt(8);
+        this.whichGen = random.nextInt(genoType.length-1);
         if(madness){
             addSomeMadness();
             System.out.println("dodano madness");
@@ -80,7 +97,7 @@ public class Animal implements WorldElement{
     }
 
     public MapDirection getNewDirection(){
-        int newDirectionId = (currentOrientation.directionToId() + genoType[whichGen %genoType.length])%8;
+        int newDirectionId = (currentOrientation.directionToId() + genoType[whichGen % genoType.length])%8;
         currentOrientation = currentOrientation.idToDirection(newDirectionId);
         return currentOrientation;
     }
@@ -97,8 +114,9 @@ public class Animal implements WorldElement{
 
         if (random.nextDouble() <= randomFactor) {
             whichGen++;
+            whichGen = whichGen%genoType.length;
         } else {
-            whichGen = random.nextInt(genoType.length); // Aktywacja losowego genu
+            whichGen = random.nextInt(genoType.length - 1); // Aktywacja losowego genu
         }
 
 
@@ -120,10 +138,21 @@ public class Animal implements WorldElement{
         } else if (grass instanceof BadGrass) {
             currentEnergy -= energy;
         }
+        grassEatenCounter++;
     }
 
-    public void animalNewChild(){
-        childNumber +=1;
+    public void animalReprodueEnergyLost(int energy){
+        currentEnergy -= energy;
+    }
+
+    public synchronized void animalNewChild(){
+        childNumber ++;
+    }
+
+    public void setDeathDay(int day){
+        if(currentEnergy < 0){
+            deathDay = day;
+        }
     }
 
 

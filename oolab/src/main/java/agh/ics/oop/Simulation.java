@@ -8,7 +8,7 @@ import java.util.*;
 
 public class Simulation implements Runnable{
 
-    private List<Animal> animals;
+    //private List<Animal> animals;
 
     public List<Animal> getDeadAnimals() {
         return deadAnimals;
@@ -35,7 +35,7 @@ public class Simulation implements Runnable{
 
     private int day=0;
 
-    private int animalId = 0;
+    //private int animalId = 0;
 
     public int getDay() {
         return day;
@@ -46,7 +46,7 @@ public class Simulation implements Runnable{
 
     public Simulation(List<Vector2d> initialPositions, GrassField map, int genNumber, int startEnergy, int energyCost, int plantPerDay, int plantEnergy, int reproduceEnergyRequired, int reproduceEnergyLost, int minMutations, int maxMutations, Boolean isSpecialGen){
         this.plantEnergy = plantEnergy;
-        List<Animal> animals = new ArrayList<>();
+        //List<Animal> animals = new ArrayList<>();
         this.energyCost = energyCost;
         this.plantPerDay = plantPerDay;
         this.reproduceEnergyRequired = reproduceEnergyRequired;
@@ -58,21 +58,24 @@ public class Simulation implements Runnable{
             int[] genes = GenoType.createRandomGenoType(genNumber);
             Animal currAnimal = new Animal(position,genes,startEnergy,map,isSpecialGen);
             map.place(currAnimal);
-            animals.add(currAnimal);
-            animalId++;
+            //animals.add(currAnimal);
+            //animalId++;
         }
-        this.animals = animals;
+        //this.animals = animals;
         this.map = map;
     }
 
+    /*
     public int getNewAnimalId(){
         animalId++;
         return animalId;
     }
 
 
+     */
+
     List<Animal> getAnimals() {
-        return Collections.unmodifiableList(animals);
+        return Collections.unmodifiableList(map.getAnimalsObj());
     }
 
     public void run(){
@@ -101,7 +104,7 @@ public class Simulation implements Runnable{
 
     }
 
-    private void updateAnimals(){
+    private synchronized void updateAnimals(){
         /*
         int sizeOfAnimals = this.animals.size();
         int iterator = 0;
@@ -122,14 +125,14 @@ public class Simulation implements Runnable{
 
          */
 
-        for(Animal animal : animals){
+        for(Animal animal : map.getAnimalsObj()){
             map.move(animal,-energyCost);
             System.out.println(animal.getCurrentEnergy());
         }
 
     }
 
-    private void eat(){
+    private synchronized void eat(){
         map.eatGrassByAnimals(plantEnergy);
     }
 
@@ -141,30 +144,30 @@ public class Simulation implements Runnable{
         isPaused = false;
     }
 
-    private void removeDeadAnimals() {
+    private synchronized void removeDeadAnimals() {
         //System.out.println("ala");
-        Iterator<Animal> iterator = animals.iterator();
         //System.out.println("ala1");
-        while (iterator.hasNext()) {
+        ArrayList<Animal> animals = new ArrayList<>(map.getAnimalsObj());
+        for (Animal animal : animals) {
             //System.out.println("ala2");
-            Animal animal = iterator.next();
             //System.out.println("ala3");
             if (animal.getCurrentEnergy() < 0) {
+                animal.setDeathDay(day);
                 //System.out.println("ala4");
                 map.removeAnimalFromMap(animal);
                 //System.out.println("ala5");
                 deadAnimals.add(animal);
                 //System.out.println("ala6");
-                iterator.remove();
+                //iterator.remove();
                 //System.out.println("ala7");
             }
         }
     }
 
-    private void animalsReproduce(){
+    private synchronized void animalsReproduce(){
         //System.out.println("sym");
-        List<Animal> newAnimals = map.reproduce(genNumber,minMutations,maxMutations,reproduceEnergyLost,reproduceEnergyRequired);
-        animals.addAll(newAnimals);
+        map.reproduce(genNumber,minMutations,maxMutations,reproduceEnergyLost,reproduceEnergyRequired);
+        //map.getAnimalsObj().addAll(newAnimals);
     }
 
 }

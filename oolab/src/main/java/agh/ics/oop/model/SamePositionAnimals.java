@@ -1,15 +1,16 @@
 package agh.ics.oop.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class SamePositionAnimals implements WorldElement {
     private final Vector2d position;
 
     public synchronized List<Animal> getAnimals() {
         return animals;
+    }
+
+    public int size(){
+        return animals.size();
     }
 
     private final List<Animal> animals = Collections.synchronizedList(new ArrayList<>());
@@ -55,91 +56,34 @@ public class SamePositionAnimals implements WorldElement {
     }
 
     public synchronized ArrayList<Animal> findStrongestAnimals() {
-        ArrayList<Animal> strongestAnimals = new ArrayList<>();
-        int mostEnergy = 0;
-        int mostDays = 0;
-        int mostChild = 0;
+        ArrayList<Animal> shuffledAnimals = new ArrayList<>(animals);
+        Collections.shuffle(shuffledAnimals);
 
-        for (Animal animal : animals) {
-            int energy = animal.getCurrentEnergy();
-            int daysAlive = animal.getDayAlive();
-            int childNumber = animal.getChildNumber();
+        shuffledAnimals.sort(
+                Comparator.<Animal>comparingInt(animal -> animal.getCurrentEnergy())
+                        .thenComparingInt(animal -> animal.getDayAlive())
+                        .thenComparingInt(animal -> animal.getChildNumber())
+                        .reversed() // Odwrócenie kolejności dla energii, by była od największej
+        );
 
-            if (strongestAnimals.isEmpty()) {
-                strongestAnimals.add(animal);
-                mostEnergy = energy;
-                mostDays = daysAlive;
-                mostChild = childNumber;
-            } else {
-                if (energy > mostEnergy) {
-                    strongestAnimals.clear();
-                    strongestAnimals.add(animal);
-                    mostEnergy = energy;
-                    mostDays = daysAlive;
-                    mostChild = childNumber;
-                } else if (energy == mostEnergy) {
-                    if (daysAlive > mostDays) {
-                        strongestAnimals.clear();
-                        strongestAnimals.add(animal);
-                        mostDays = daysAlive;
-                        mostChild = childNumber;
-                    } else if (daysAlive == mostDays) {
-                        if (childNumber > mostChild) {
-                            strongestAnimals.clear();
-                            strongestAnimals.add(animal);
-                            mostChild = childNumber;
-                        } else if (childNumber == mostChild) {
-                            strongestAnimals.add(animal);
-                        }
-                    }
-                }
-            }
-        }
-
-        return strongestAnimals;
+        return shuffledAnimals;
     }
 
     public ArrayList<Animal> findTwoStrongestAnimals() {
         ArrayList<Animal> result = new ArrayList<>();
-        Random random = new Random();
-
-        while (result.size() < 2 && !animals.isEmpty()) {
-            ArrayList<Animal> strongestAnimals = this.findStrongestAnimals();
-
-            if (strongestAnimals.isEmpty()) {
-                break;
-            }
-
-            if (strongestAnimals.size() > 2) {
-                int index1 = random.nextInt(strongestAnimals.size());
-                int index2;
-                do {
-                    index2 = random.nextInt(strongestAnimals.size());
-                } while (index2 == index1);
-
-                result.add(strongestAnimals.get(index1));
-                result.add(strongestAnimals.get(index2));
-            } else {
-                result.addAll(strongestAnimals);
-            }
-
+        if(!animals.isEmpty() && animals.size() > 1) {
+            ArrayList<Animal> strongestAnimals = findStrongestAnimals();
+            result.add(strongestAnimals.get(0));
+            result.add(strongestAnimals.get(1));
+            return result;
         }
-
-        return result;
+        return null;
     }
 
     public Animal getRandomStrongest(){
-        Random random = new Random();
         if(!animals.isEmpty()) {
-            ArrayList<Animal> strongestAnimals = this.findStrongestAnimals();
-
-            if (strongestAnimals.isEmpty()) {
-                return null;
-            }
-            int index1 = random.nextInt(strongestAnimals.size());
-
-            return strongestAnimals.get(index1);
-
+            ArrayList<Animal> strongestAnimals = findStrongestAnimals();
+            return strongestAnimals.get(0);
         }
         return null;
     }

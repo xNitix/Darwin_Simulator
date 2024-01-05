@@ -19,6 +19,7 @@ import javafx.scene.shape.Rectangle;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -70,6 +71,9 @@ public class SimulationPresenter implements MapChangeListener {
 
     @FXML
     private GridPane mapGrid;
+
+    @FXML
+    private VBox mapAndTrack;
     private GrassField worldMap;
     private int cellSize = 280;
     private int startEnergy;
@@ -235,12 +239,23 @@ public class SimulationPresenter implements MapChangeListener {
         //    mapGrid.add(rowsDescription, 0, numRows - y + 1);
         //    GridPane.setHalignment(rowsDescription, HPos.CENTER);
         //}
-
+        Vector2d trackPosition = null;
+        if(statistics.getSelectedAnimal() != null && statistics.getSelectedAnimal().getCurrentEnergy() > -1)
+        {
+            trackPosition = statistics.getSelectedAnimal().getPosition();
+        }
         for (int y = numRows; y >= 0; y--) {
             for (int x = 0; x <= numCols; x++) {
                 Rectangle komorka = new Rectangle(cellSize, cellSize);
                 komorka.setStroke(Color.BLACK);
                 Vector2d aktualnaPozycja = new Vector2d(x + bounds.leftDown().getX(), y + bounds.leftDown().getY());
+
+                if(trackPosition != null){
+                    if(aktualnaPozycja.equals(trackPosition)){
+                        komorka.setStroke(Color.RED);
+                        komorka.setStrokeWidth(3);
+                    }
+                }
 
                 FieldType fieldType = worldMap.getFieldType(aktualnaPozycja);
                 if(fieldType == FieldType.PREFERRED){
@@ -459,6 +474,7 @@ public class SimulationPresenter implements MapChangeListener {
         liveAnimalsChildAvgLabel.setText("Alive Animals Child AVG: " + liveAnimalsChildAvg);
         mostFamounsGenoTypeLabel.setText("Famous Genotype: " + Arrays.toString(mostFamousGenoType));
         updateChart();
+        updateSelectedAnimalStats(statistics.getSelectedAnimal());
     }
     public SimulationStatistics getSimulationStatistics() {
         return statistics;
@@ -547,5 +563,65 @@ public class SimulationPresenter implements MapChangeListener {
 
     public void setDominantButton(Button dominantButton) {
         this.dominantButton = dominantButton;
+    }
+
+    public void ontrackAnimalButton() {
+        List<Animal> animals = statistics.getDeadAndAliveAnimals();
+
+        List<String> choices = animals.stream()
+                .sorted(Comparator.comparingInt(Animal::getId))
+                .map(animal -> "ID: " + animal.getId() + ", Position: " + animal.getPosition() + ", Energy: " + animal.getCurrentEnergy())
+                .collect(Collectors.toList());
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(null, choices);
+        dialog.setTitle("Select Animal");
+        dialog.setHeaderText("Choose an animal:");
+        dialog.setContentText("Animal:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(selectedAnimalInfo -> {
+            int selectedAnimalID = Integer.parseInt(selectedAnimalInfo.split(":")[1].split(",")[0].trim()); // Pobranie ID wybranego zwierzęcia
+
+            Animal selectedAnimal = statistics.findSelectedAnimal(selectedAnimalID); // Znalezienie wybranego zwierzęcia
+            updateSelectedAnimalStats(selectedAnimal);
+
+        });
+    }
+
+    public void setMapAndTrack(VBox mapAndTrack) {
+        this.mapAndTrack = mapAndTrack;
+    }
+
+    public synchronized void updateSelectedAnimalStats(Animal selectedAnimal) {
+        if (selectedAnimal != null) {
+            // Utworzenie i ustawienie danych w boxie pod mapą
+            VBox animalStatsBox = new VBox();
+            animalStatsBox.setSpacing(10);
+            animalStatsBox.setStyle("-fx-background-color: white;-fx-border-color: black; -fx-border-width: 3px;-fx-padding: 3;");
+            // Tutaj ustaw informacje o zwierzęciu w animalStatsBox
+            Label animalInfoLabel = new Label("Selected Animal Info:");
+            animalInfoLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+            Label idLabel = new Label("ID: " + selectedAnimal.getId());
+            idLabel.setStyle("-fx-font-weight: bold;");
+            Label positionLabel = new Label("Position: " + selectedAnimal.getPosition());
+            positionLabel.setStyle("-fx-font-weight: bold;");
+            Label genoType = new Label("Genotype: " + Arrays.toString(selectedAnimal.getGenoType()));
+            Label activeGen = new Label("Active gen: " + selectedAnimal.getGenoType()[selectedAnimal.getWhichGen()]);
+            Label energyLabel = new Label("Energy: " + selectedAnimal.getCurrentEnergy());
+            Label grassEatenCounter = new Label("Eaten grass counter: " + selectedAnimal.getGrassEatenCounter());
+            Label childCount = new Label("Child counter: " + selectedAnimal.getChildNumber());
+            Label lifeStatus = new Label();
+            if(selectedAnimal.getDeathDay() == -1){
+                lifeStatus.setText("Days Alive: " + selectedAnimal.getDayAlive());
+            } else {
+                lifeStatus.setText("Death day: " + selectedAnimal.getDeathDay());
+            }
+
+
+            animalStatsBox.getChildren().addAll(animalInfoLabel, idLabel, positionLabel, genoType, activeGen, energyLabel, grassEatenCounter, childCount, lifeStatus);
+
+            mapAndTrack.getChildren().clear();
+            mapAndTrack.getChildren().addAll(mapGrid, animalStatsBox);
+        }
     }
 }
