@@ -9,13 +9,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class SimulationEngine {
-    private final List<Simulation> simulations;
+    private final List<Simulation> simulations = new ArrayList<>();
     private final List<Thread> threads = new ArrayList<>();
 
-    private final ExecutorService executorService;
-    public SimulationEngine(List<Simulation> simulations,int n) {
-        this.simulations = simulations;
-        this.executorService = Executors.newFixedThreadPool(n);
+    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+    public SimulationEngine() {
 
     }
     public void runSync() {
@@ -58,6 +56,27 @@ public class SimulationEngine {
     public void runAsyncInThreadPool() {
         for (Simulation simulation : simulations) {
             executorService.submit(simulation);
+        }
+    }
+
+    public void stopAllSimulations() {
+        for (Simulation simulation : simulations) {
+            simulation.stopSimulation();
+        }
+    }
+
+    public void resumeAllSimulations() {
+        for (Simulation simulation : simulations) {
+            simulation.resumeSimulation();
+        }
+    }
+
+    public void addSimulation(Simulation simulation) {
+        simulations.add(simulation);
+        if (executorService != null) {
+            executorService.submit(simulation);
+        } else {
+            System.out.println("ExecutorService not initialized yet!");
         }
     }
 

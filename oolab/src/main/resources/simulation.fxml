@@ -3,25 +3,72 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.layout.HBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            minHeight="550.0" minWidth="850.0"
+            minHeight="550.0" minWidth="923.0"
             fx:controller="agh.ics.oop.presenter.SimulationPresenter">
     <center>
-        <Label fx:id="infoLabel" text="All animals will be living here!" textAlignment="CENTER"/>
-        <GridPane fx:id="mapGrid" gridLinesVisible="true" alignment="CENTER"/>
+        <HBox spacing="20" alignment="CENTER">
+            <VBox spacing="10">
+                <Label text="Animals Options" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+
+                <Label text="Choose an option:"/>
+                <RadioButton fx:id="normalNextGenButton" text="Complete Predestination" onAction="#onRadioButtonClickedGen"/>
+                <RadioButton fx:id="madnessNextGenButton" text="Bit of madness" onAction="#onRadioButtonClickedGen"/>
+
+                <Label text="Animal number:"/>
+                <TextField fx:id="animalNumber" promptText="Enter animal number"/>
+
+                <Label text="Length of genotype:"/>
+                <TextField fx:id="genNumberField" promptText="Enter length of genotype"/>
+
+                <Label text="Start Energy:"/>
+                <TextField fx:id="startEnergyField" promptText="Enter start energy"/>
+
+                <Label text="Move cost energy"/>
+                <TextField fx:id="moveEnergyCost" promptText="Enter energy cost for move"/>
+
+                <Label text="Reproduce energy"/>
+                <TextField fx:id="reproduceEnergyField" promptText="Enter energy required to reproduce"/>
+
+                <Label text="Energy cost for each parent"/>
+                <TextField fx:id="reproduceEnergyLostField" promptText="Enter cost of energy for each parent intended for the child"/>
+
+                <Label text="Minimum number of mutations"/>
+                <TextField fx:id="minMutationsField" promptText="Enter Minimum number of mutations"/>
+
+                <Label text="Maximum number of mutations"/>
+                <TextField fx:id="maxMutationsField" promptText="Enter Maximum number of mutations"/>
+
+                <Label fx:id="description"/>
+
+            </VBox>
+            <VBox spacing="10">
+                <Label text="Map Options" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+
+                <Label text="Choose an option:"/>
+                <RadioButton fx:id="forestedEquatorRadioButton" text="Forested Equator" onAction="#onRadioButtonClicked"/>
+                <RadioButton fx:id="poisonedFruitRadioButton" text="Poisoned Fruit" onAction="#onRadioButtonClicked"/>
+
+                <Label text="Map width:"/>
+                <TextField fx:id="widthField" promptText="Enter width"/>
+
+                <Label text="Map height:"/>
+                <TextField fx:id="heightField" promptText="Enter height"/>
+
+
+                <Label text="Start grass quantity:"/>
+                <TextField fx:id="grassQuantityField" promptText="Enter grass quantity"/>
+
+                <Label text="Energy from plant"/>
+                <TextField fx:id="energyEatField" promptText="Enter energy for eating the plant"/>
+
+                <Label text="New plant per day"/>
+                <TextField fx:id="plantPerDayField" promptText="Enter how many plants should appear every day"/>
+            </VBox>
+        </HBox>
     </center>
-
-    <bottom>
-        <VBox>
-            <TextField fx:id="inputField" promptText="moves"/>
-            <Label fx:id="description" text="moves list"/>
-            <Button fx:id="startButton" text="Start" onAction="#onSimulationStartClicked"/>
-        </VBox>
-    </bottom>
-
-
 </BorderPane>
