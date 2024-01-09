@@ -41,6 +41,8 @@ public class Simulation implements Runnable{
         return day;
     }
 
+    private UUID simulationID = UUID.randomUUID();
+
     private volatile boolean isPaused = false; // Flaga do zatrzymywania/wznawiania symulacji
 
 
@@ -81,6 +83,7 @@ public class Simulation implements Runnable{
     public void run(){
         while(true) {
             if (!isPaused) {
+                System.out.println(simulationID);
                 //System.out.println("tu1");
                 //System.out.println(deadAnimals.size());
                 //System.out.println("tu2");
@@ -95,7 +98,7 @@ public class Simulation implements Runnable{
                 //System.out.println("tu6");
                 day++;
                 try {
-                    Thread.sleep(1000); // Opóźnienie 1 sekunda między kolejnymi aktualizacjami
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

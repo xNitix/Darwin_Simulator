@@ -15,6 +15,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SimulationApp extends Application {
 
@@ -25,17 +27,18 @@ public class SimulationApp extends Application {
         primaryStage.show();
     }
 
-    private static Button getButton(SimulationPresenter controller, TabPane tabPane) {
+    private List<SimulationPresenter> simulationControllers = new ArrayList<>();
+
+    private static Button getButton(FXMLLoader loader, TabPane tabPane) {
         Button startButton = new Button("Start Simulation");
         startButton.setOnAction(event -> {
-            // Tworzenie zakładki i zawartości symulacji
+            SimulationPresenter controller = loader.getController();
+            controller.initialize();
             Tab simulationTab = new Tab("Simulation");
 
-            // Utworzenie kontenera HBox do przechowywania statystyk, przycisków i mapy
             HBox simulationContent = new HBox();
             simulationContent.setStyle("-fx-background-image: url('file:oolab/src/main/resources/koty/background.png'); -fx-padding: 30;");
 
-            // Utworzenie kontenera VBox do przechowywania statystyk i przycisków
             VBox leftContent = new VBox();
             leftContent.setStyle("-fx-background-color: white;-fx-border-color: black; -fx-border-width: 3px;-fx-padding: 3;");
 
@@ -85,19 +88,16 @@ public class SimulationApp extends Application {
 
             Label statisticsTitle = new Label("Statistics: ");
             statisticsTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-            // Dodanie statystyk i przycisków do lewego kontenera
             leftContent.getChildren().addAll(statisticsTitle, animalCountLabel, plantCountLabel, freeFieldCountLabel, mostFamounsGenoTypeLabel, liveAnimalsAvgEnergyLabel, deadAniamlsDaysAlivedLabel, liveAnimalsChildAvgLabel, legendContainer, lineChart, buttonContainer);
 
             VBox mapAndTrack = new VBox();
             mapAndTrack.getChildren().addAll(mapGrid);
             controller.setMapAndTrack(mapAndTrack);
 
-            // Dodanie lewego kontenera i mapy do głównego kontenera
             simulationContent.getChildren().addAll(leftContent, mapAndTrack);
 
-            // Ustawienie właściwości VBox
-            leftContent.setAlignment(Pos.TOP_LEFT); // Statystyki i przyciski będą na górze po lewej stronie
-            leftContent.setSpacing(15); // Dodanie odstępu między elementami
+            leftContent.setAlignment(Pos.TOP_LEFT);
+            leftContent.setSpacing(15);
 
             simulationTab.setContent(simulationContent);
 
@@ -116,8 +116,6 @@ public class SimulationApp extends Application {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("simulation.fxml"));
                 viewRoot = loader.load();
-                SimulationPresenter controller = loader.getController();
-                controller.initialize();
 
                 TabPane tabPane = new TabPane();
                 Tab parametersTab = new Tab("Parameters");
@@ -125,7 +123,7 @@ public class SimulationApp extends Application {
 
                 parametersContent.getChildren().add(viewRoot);
 
-                Button startButton = getButton(controller, tabPane);
+                Button startButton = getButton(loader, tabPane);
                 startButton.setMaxWidth(200);
 
                 HBox buttonContainer = new HBox();

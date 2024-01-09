@@ -83,7 +83,7 @@ public class SimulationPresenter implements MapChangeListener {
     private int plantPerDay;
     private int reproduceEnergy;
     private int reproduceEnergyLost;
-    private SimulationEngine simulationEngine;
+    private SimulationEngine simulationEngine = new SimulationEngine();
     private int maxMutations;
     private int minMutations;
 
@@ -266,7 +266,6 @@ public class SimulationPresenter implements MapChangeListener {
                     mapGrid.add(komorka, x, numRows - y);
                 }
 
-                // Ustawianie kolorów na podstawie typu obiektu na danej pozycji
                 Object obiekt = worldMap.objectAt(aktualnaPozycja);
                 if (obiekt instanceof Grass) {
                     ImageView imageView = new ImageView(goodPlant);
@@ -351,9 +350,8 @@ public class SimulationPresenter implements MapChangeListener {
                 Simulation simulation = new Simulation(positions, worldMap, genNumber, startEnergy, moveCost, plantPerDay, energyForGrass, reproduceEnergy, reproduceEnergyLost, minMutations, maxMutations, isSpecialGen);
                 statistics = new SimulationStatistics(map,simulation);
 
-                SimulationEngine simulationEngine = new SimulationEngine(Arrays.asList(simulation), 4);
-                this.simulationEngine = simulationEngine;
-                simulationEngine.runAsyncInThreadPool();
+                simulationEngine.addSimulation(simulation);
+
             }
         } catch (NumberFormatException e) {
             // tu tez
@@ -582,7 +580,7 @@ public class SimulationPresenter implements MapChangeListener {
         result.ifPresent(selectedAnimalInfo -> {
             int selectedAnimalID = Integer.parseInt(selectedAnimalInfo.split(":")[1].split(",")[0].trim()); // Pobranie ID wybranego zwierzęcia
 
-            Animal selectedAnimal = statistics.findSelectedAnimal(selectedAnimalID); // Znalezienie wybranego zwierzęcia
+            Animal selectedAnimal = statistics.findSelectedAnimal(selectedAnimalID);
             updateSelectedAnimalStats(selectedAnimal);
 
         });
@@ -594,11 +592,9 @@ public class SimulationPresenter implements MapChangeListener {
 
     public synchronized void updateSelectedAnimalStats(Animal selectedAnimal) {
         if (selectedAnimal != null) {
-            // Utworzenie i ustawienie danych w boxie pod mapą
             VBox animalStatsBox = new VBox();
             animalStatsBox.setSpacing(10);
             animalStatsBox.setStyle("-fx-background-color: white;-fx-border-color: black; -fx-border-width: 3px;-fx-padding: 3;");
-            // Tutaj ustaw informacje o zwierzęciu w animalStatsBox
             Label animalInfoLabel = new Label("Selected Animal Info:");
             animalInfoLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
             Label idLabel = new Label("ID: " + selectedAnimal.getId());
