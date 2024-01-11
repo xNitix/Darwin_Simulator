@@ -337,7 +337,7 @@ public class SimulationPresenter implements MapChangeListener {
             minMutations = Integer.parseInt(minMutationsField.getText());
             maxMutations = Integer.parseInt(maxMutationsField.getText());
             genNumber = Integer.parseInt(genNumberField.getText());
-            cellSize=cellSize/width+30;
+            cellSize=  (int) 430/Math.max(width,height);
 
             if (width <= 0 || height <= 0 || grassQuantity < 0 || startEnergy < 0) {
 
@@ -593,10 +593,10 @@ public class SimulationPresenter implements MapChangeListener {
     public synchronized void updateSelectedAnimalStats(Animal selectedAnimal) {
         if (selectedAnimal != null) {
             VBox animalStatsBox = new VBox();
-            animalStatsBox.setSpacing(10);
+            animalStatsBox.setSpacing(2);
             animalStatsBox.setStyle("-fx-background-color: white;-fx-border-color: black; -fx-border-width: 3px;-fx-padding: 3;");
             Label animalInfoLabel = new Label("Selected Animal Info:");
-            animalInfoLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+            animalInfoLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
             Label idLabel = new Label("ID: " + selectedAnimal.getId());
             idLabel.setStyle("-fx-font-weight: bold;");
             Label positionLabel = new Label("Position: " + selectedAnimal.getPosition());
