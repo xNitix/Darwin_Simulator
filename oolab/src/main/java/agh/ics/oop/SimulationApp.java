@@ -21,123 +21,122 @@ import java.util.List;
 public class SimulationApp extends Application {
 
     private BorderPane viewRoot;
+    private FXMLLoader loader;
+
+    private int simulationNumber = 0;
 
     public void start(Stage primaryStage) {
-        configureStage(primaryStage, viewRoot);
+        configureStage(primaryStage);
         primaryStage.show();
     }
 
-    private List<SimulationPresenter> simulationControllers = new ArrayList<>();
+    private void startNewSimulation(TabPane tabPane) {
+        Tab simulationTab = new Tab("Simulation " + simulationNumber);
+        SimulationPresenter controller = loader.getController();
 
-    private static Button getButton(SimulationPresenter controller, TabPane tabPane) {
-        Button startButton = new Button("Start Simulation");
-        startButton.setOnAction(event -> {
-            Tab simulationTab = new Tab("Simulation");
+        HBox simulationContent = new HBox();
+        simulationContent.setStyle("-fx-background-image: url('file:oolab/src/main/resources/koty/background.png'); -fx-padding: 5 0 10 30;");
 
-            HBox simulationContent = new HBox();
-            simulationContent.setStyle("-fx-background-image: url('file:oolab/src/main/resources/koty/background.png'); -fx-padding: 30;");
+        VBox leftContent = new VBox();
+        leftContent.setStyle("-fx-background-color: white;-fx-border-color: black; -fx-border-width: 3px;-fx-padding: 3;");
 
-            VBox leftContent = new VBox();
-            leftContent.setStyle("-fx-background-color: white;-fx-border-color: black; -fx-border-width: 3px;-fx-padding: 3;");
+        GridPane mapGrid = new GridPane();
+        mapGrid.setStyle("-fx-background-color: white;-fx-border-color: black; -fx-border-width: 3px;");
+        controller.setMapGrid(mapGrid);
 
-            GridPane mapGrid = new GridPane();
-            mapGrid.setStyle("-fx-background-color: white;-fx-border-color: black; -fx-border-width: 3px;");
-            controller.setMapGrid(mapGrid);
+        Label animalCountLabel = new Label();
+        Label plantCountLabel = new Label();
+        Label freeFieldCountLabel = new Label();
+        Label mostFamounsGenoTypeLabel = new Label();
+        Label liveAnimalsAvgEnergyLabel = new Label();
+        Label deadAniamlsDaysAlivedLabel = new Label();
+        Label liveAnimalsChildAvgLabel = new Label();
 
-            Label animalCountLabel = new Label();
-            Label plantCountLabel = new Label();
-            Label freeFieldCountLabel = new Label();
-            Label mostFamounsGenoTypeLabel = new Label();
-            Label liveAnimalsAvgEnergyLabel = new Label();
-            Label deadAniamlsDaysAlivedLabel = new Label();
-            Label liveAnimalsChildAvgLabel = new Label();
+        LineChart<Number, Number> lineChart = new LineChart<>(new NumberAxis(), new NumberAxis());
 
-            LineChart<Number, Number> lineChart = new LineChart<>(new NumberAxis(), new NumberAxis());
+        controller.setLineChart(lineChart);
+        controller.setAnimalCountLabel(animalCountLabel);
+        controller.setDeadAniamlsDaysAlivedLabel(deadAniamlsDaysAlivedLabel);
+        controller.setPlantCountLabel(plantCountLabel);
+        controller.setFreeFieldCountLabel(freeFieldCountLabel);
+        controller.setMostFamounsGenoTypeLabel(mostFamounsGenoTypeLabel);
+        controller.setLiveAnimalsAvgEnergyLabel(liveAnimalsAvgEnergyLabel);
+        controller.setLiveAnimalsChildAvgLabel(liveAnimalsChildAvgLabel);
 
-            controller.setLineChart(lineChart);
-            controller.setAnimalCountLabel(animalCountLabel);
-            controller.setDeadAniamlsDaysAlivedLabel(deadAniamlsDaysAlivedLabel);
-            controller.setPlantCountLabel(plantCountLabel);
-            controller.setFreeFieldCountLabel(freeFieldCountLabel);
-            controller.setMostFamounsGenoTypeLabel(mostFamounsGenoTypeLabel);
-            controller.setLiveAnimalsAvgEnergyLabel(liveAnimalsAvgEnergyLabel);
-            controller.setLiveAnimalsChildAvgLabel(liveAnimalsChildAvgLabel);
+        Button pauseButton = new Button("Pause");
+        pauseButton.setOnAction(e -> controller.onPauseSimulation());
 
-            Button pauseButton = new Button("Pause");
-            pauseButton.setOnAction(e -> controller.onPauseSimulation());
+        Button resetButton = new Button("Reset");
+        resetButton.setOnAction(e -> controller.onResumeSimulation());
 
-            Button resetButton = new Button("Reset");
-            resetButton.setOnAction(e -> controller.onResumeSimulation());
+        Button dominantButton = new Button("Dominant Genotype Animals");
+        dominantButton.setVisible(false);
+        controller.setDominantButton(dominantButton);
+        dominantButton.setOnAction(e -> controller.onFollowSimulation());
 
-            Button dominantButton = new Button("Dominant Genotype Animals");
-            dominantButton.setVisible(false);
-            controller.setDominantButton(dominantButton);
-            dominantButton.setOnAction(e -> controller.onFollowSimulation());
+        Button trackAnimalButton = new Button("Track Animal");
+        trackAnimalButton.setOnAction(e -> controller.ontrackAnimalButton());
 
-            Button trackAnimalButton = new Button("Track Animal");
-            trackAnimalButton.setOnAction(e -> controller.ontrackAnimalButton());
+        HBox buttonContainer = new HBox(pauseButton, resetButton, dominantButton, trackAnimalButton);
+        buttonContainer.setSpacing(10); // Odstęp między przyciskami
 
-            HBox buttonContainer = new HBox(pauseButton, resetButton, dominantButton, trackAnimalButton);
-            buttonContainer.setSpacing(10); // Odstęp między przyciskami
+        VBox legendContainer = new VBox();
+        controller.setLegendContainer(legendContainer);
+        controller.createLegend();
 
-            VBox legendContainer = new VBox();
-            controller.setLegendContainer(legendContainer);
-            controller.createLegend();
+        Label statisticsTitle = new Label("Statistics: ");
+        statisticsTitle.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+        leftContent.getChildren().addAll(statisticsTitle, animalCountLabel, plantCountLabel, freeFieldCountLabel, mostFamounsGenoTypeLabel, liveAnimalsAvgEnergyLabel, deadAniamlsDaysAlivedLabel, liveAnimalsChildAvgLabel, legendContainer, lineChart, buttonContainer);
 
-            Label statisticsTitle = new Label("Statistics: ");
-            statisticsTitle.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
-            leftContent.getChildren().addAll(statisticsTitle, animalCountLabel, plantCountLabel, freeFieldCountLabel, mostFamounsGenoTypeLabel, liveAnimalsAvgEnergyLabel, deadAniamlsDaysAlivedLabel, liveAnimalsChildAvgLabel, legendContainer, lineChart, buttonContainer);
+        VBox mapAndTrack = new VBox();
+        mapAndTrack.getChildren().addAll(mapGrid);
+        controller.setMapAndTrack(mapAndTrack);
 
-            VBox mapAndTrack = new VBox();
-            mapAndTrack.getChildren().addAll(mapGrid);
-            controller.setMapAndTrack(mapAndTrack);
+        simulationContent.getChildren().addAll(leftContent, mapAndTrack);
 
-            simulationContent.getChildren().addAll(leftContent, mapAndTrack);
+        leftContent.setAlignment(Pos.TOP_LEFT);
+        leftContent.setSpacing(2);
 
-            leftContent.setAlignment(Pos.TOP_LEFT);
-            leftContent.setSpacing(5);
+        simulationTab.setContent(simulationContent);
 
-            simulationTab.setContent(simulationContent);
+        tabPane.getTabs().add(simulationTab);
+        tabPane.getSelectionModel().select(simulationTab);
 
-            tabPane.getTabs().add(simulationTab);
-            tabPane.getSelectionModel().select(simulationTab);
-
-            controller.onSimulationStartClicked(event);
-        });
-        return startButton;
+        controller.onSimulationStartClicked();
     }
 
 
 
-    private void configureStage(Stage primaryStage, BorderPane viewRoot) {
+    private void configureStage(Stage primaryStage) {
         if (viewRoot == null) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("simulation.fxml"));
-                viewRoot = loader.load();
-                SimulationPresenter controller = loader.getController();
-
+                refreshParamtersTab();
                 TabPane tabPane = new TabPane();
                 Tab parametersTab = new Tab("Parameters");
-                VBox parametersContent = new VBox(10);
+                VBox parametersContent = new VBox(2);
 
                 parametersContent.getChildren().add(viewRoot);
 
-                Button startButton = getButton(controller, tabPane);
+                Button startButton = new Button("Start New Simulation");
                 startButton.setMaxWidth(200);
-
                 HBox buttonContainer = new HBox();
                 buttonContainer.getChildren().add(startButton);
                 buttonContainer.setAlignment(Pos.CENTER);
+                startButton.setOnAction(event -> {
+                    startNewSimulation(tabPane);
+                    refreshParamtersTab();
+                    parametersContent.getChildren().clear();
+                    parametersContent.getChildren().add(viewRoot);
+                    parametersContent.getChildren().addAll(new Label(), buttonContainer);
+                    simulationNumber ++;
+
+                });
 
                 parametersContent.getChildren().addAll(new Label(), buttonContainer);
                 parametersTab.setContent(parametersContent);
                 tabPane.getTabs().add(parametersTab);
-                controller.initialize();
-                Scene scene = new Scene(new BorderPane(tabPane), 200, 720);
+                Scene scene = new Scene(new BorderPane(tabPane), 200, 700);
                 primaryStage.setScene(scene);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
         }
 
         primaryStage.setTitle("Simulation App");
@@ -145,5 +144,13 @@ public class SimulationApp extends Application {
         primaryStage.minHeightProperty().bind(viewRoot.minHeightProperty());
     }
 
+    private void refreshParamtersTab(){
+        try{
+            loader = new FXMLLoader(getClass().getClassLoader().getResource("simulation.fxml"));
+            viewRoot = loader.load();
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

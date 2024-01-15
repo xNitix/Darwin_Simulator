@@ -322,7 +322,7 @@ public class SimulationPresenter implements MapChangeListener {
         });
     }
 
-    public void onSimulationStartClicked(ActionEvent actionEvent) {
+    public void onSimulationStartClicked() {
         try {
             int width = Integer.parseInt(widthField.getText());
             int height = Integer.parseInt(heightField.getText());

@@ -11,9 +11,9 @@
             minHeight="550.0" minWidth="923.0"
             fx:controller="agh.ics.oop.presenter.SimulationPresenter">
     <center>
-        <HBox spacing="20" alignment="CENTER">
-            <VBox spacing="10">
-                <Label text="Animals Options" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+        <HBox spacing="10" alignment="CENTER">
+            <VBox spacing="8">
+                <Label text="Animals Options" style="-fx-font-size: 15; -fx-font-weight: bold;"/>
 
                 <Label text="Choose an option:"/>
                 <RadioButton fx:id="normalNextGenButton" text="Complete Predestination" onAction="#onRadioButtonClickedGen"/>
@@ -46,8 +46,8 @@
                 <Label fx:id="description"/>
 
             </VBox>
-            <VBox spacing="10">
-                <Label text="Map Options" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+            <VBox spacing="8">
+                <Label text="Map Options" style="-fx-font-size: 15; -fx-font-weight: bold;"/>
 
                 <Label text="Choose an option:"/>
                 <RadioButton fx:id="forestedEquatorRadioButton" text="Forested Equator" onAction="#onRadioButtonClicked"/>
