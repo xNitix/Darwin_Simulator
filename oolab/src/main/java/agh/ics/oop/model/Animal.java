@@ -114,7 +114,6 @@ public class Animal implements WorldElement{
         this.whichGen = random.nextInt(genoType.length-1);
         if(madness){
             addSomeMadness();
-            System.out.println("dodano madness");
         }
         this.parent1=parent1;
         this.parent2=parent2;
@@ -136,7 +135,6 @@ public class Animal implements WorldElement{
         this.whichGen = random.nextInt(genoType.length-1);
         if(madness){
             addSomeMadness();
-            System.out.println("dodano madness");
         }
     }
 
@@ -167,7 +165,6 @@ public class Animal implements WorldElement{
         }
         currentEnergy += energyCost;
         dayAlive++;
-        //System.out.println(getCurrentEnergy());
 
         if (random.nextDouble() <= randomFactor) {
             whichGen++;
@@ -176,13 +173,6 @@ public class Animal implements WorldElement{
             whichGen = random.nextInt(genoType.length - 1); // Aktywacja losowego genu
         }
 
-
-        /*
-            if(validator.canMoveTo(newPosition)){
-                this.position = newPosition;
-            }
-
-         */
     }
 
     public void addSomeMadness() {

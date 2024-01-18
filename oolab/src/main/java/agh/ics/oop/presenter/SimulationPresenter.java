@@ -114,13 +114,6 @@ public class SimulationPresenter implements MapChangeListener {
 
     String filePath;
 
-    public void setStatisticsGrid(GridPane statisticsGrid) {
-        this.statisticsGrid = statisticsGrid;
-    }
-
-    @FXML
-    private GridPane statisticsGrid;
-
     public void setPlantCountLabel(Label plantCountLabel) {
         this.plantCountLabel = plantCountLabel;
     }
@@ -208,7 +201,6 @@ public class SimulationPresenter implements MapChangeListener {
     }
 
 
-
     public void setWorldMap(GrassField worldMap) {
         this.worldMap = worldMap;
     }
@@ -234,21 +226,6 @@ public class SimulationPresenter implements MapChangeListener {
             mapGrid.getRowConstraints().add(new RowConstraints(cellSize));
         }
 
-        //Label leftUp = new Label("y/x");
-        //mapGrid.add(leftUp, 0, 0);
-        //GridPane.setHalignment(leftUp, HPos.CENTER);
-
-        //for (int x = 1; x <= numCols; x++) {
-        //    Label columnDescription = new Label(String.valueOf(x - 1 + bounds.leftDown().getX()));
-        //    mapGrid.add(columnDescription, x, 0);
-        //    GridPane.setHalignment(columnDescription, HPos.CENTER);
-        //}
-
-        //for (int y = numRows; y > 0; y--) {
-        //    Label rowsDescription = new Label(String.valueOf(y - 1 + bounds.leftDown().getY()));
-        //    mapGrid.add(rowsDescription, 0, numRows - y + 1);
-        //    GridPane.setHalignment(rowsDescription, HPos.CENTER);
-        //}
         Vector2d trackPosition = null;
         if(statistics.getSelectedAnimal() != null && statistics.getSelectedAnimal().getCurrentEnergy() > -1)
         {
@@ -289,7 +266,6 @@ public class SimulationPresenter implements MapChangeListener {
                     mapGrid.add(imageView, x, numRows - y);
                 } else if (obiekt instanceof Animal) {
                     int energy = ((Animal) obiekt).getCurrentEnergy();
-                    //System.out.println((double)energy/startEnergy*100);
                     if((double)energy/startEnergy*100 > 80){
                         ImageView imageView = new ImageView(blackCat);
                         imageView.setFitWidth(cellSize);
@@ -394,7 +370,6 @@ public class SimulationPresenter implements MapChangeListener {
         radioGroup = new ToggleGroup();
         poisonedFruitRadioButton.setToggleGroup(radioGroup);
         forestedEquatorRadioButton.setToggleGroup(radioGroup);
-        // Ustawienie domyślnie zaznaczonego przycisku
         forestedEquatorRadioButton.setSelected(true);
 
         radioGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
@@ -496,9 +471,6 @@ public class SimulationPresenter implements MapChangeListener {
                     Arrays.toString(mostFamousGenoType), String.valueOf(liveAnimalsAvgEnergy), String.valueOf(daysAlive),String.valueOf(liveAnimalsChildAvg)};
             appendToCSV(filePath,row);
         }
-    }
-    public SimulationStatistics getSimulationStatistics() {
-        return statistics;
     }
 
     public void updateChart() {

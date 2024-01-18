@@ -58,50 +58,25 @@ public class GrassField {
     }
 
     public synchronized void place(Animal animal) {
-        //if (canMoveTo(animal.getPosition())) {
         addAnimalToMap(animal, animal.getPosition());
         mapChanged("animal placed : " + animal.getPosition());
         animalsObj.add(animal);
         addGenotype(animal.getGenoType());
-        //} else {
-        //    throw new PositionAlreadyOccupiedException(animal.getPosition());
-        //}
-
     }
 
     public synchronized void addAnimalToMap(Animal animal, Vector2d position){
         if(!animals.containsKey(position)){
-            SamePositionAnimals samePositionAnimals = new SamePositionAnimals(position,animal,this);
+            SamePositionAnimals samePositionAnimals = new SamePositionAnimals(position,animal);
             animals.put(position, samePositionAnimals);
         } else {
             animals.get(position).addAnimal(animal);
         }
     }
 
-    /*
-    public boolean canMoveTo(Vector2d position) {
-        return !animals.containsKey(position);
-    }
-
-     */
-
     public boolean isOccupied(Vector2d position) {
         return animals.containsKey((position)) || grasses.containsKey(position);
     }
 
-
-
-    public Collection<WorldElement> getElements() {
-        List<WorldElement> elements = new ArrayList<>();
-        for (SamePositionAnimals samePositionAnimals : animals.values()) {
-            elements.addAll(samePositionAnimals.getAnimals());
-        }
-
-        Collection<WorldElement> allElements = new ArrayList<>(elements);
-        allElements.addAll(grasses.values());
-        return allElements;
-
-    }
 
     @Override
     public String toString() {
@@ -250,20 +225,13 @@ public class GrassField {
         return new Boundary(leftDownGrass,rightUpGrass);
     }
 
-    public UUID getID() {
-        return id;
-    }
-
     public synchronized void move(Animal animal, int energyCost) {
-
-       // System.out.println(Arrays.toString(animal.getGenoType()));
         MapDirection newDirection= animal.getNewDirection();
         Vector2d oldPosition = animal.getPosition();
         Vector2d newPosition = generateNewPosition(oldPosition,newDirection);
 
         if (grasses.get(newPosition) != null && grasses.get(newPosition) instanceof BadGrass) {
             if (dashBadGrass()) {
-                System.out.println("Dash BadGrass!!!");
                 Vector2d newPosition2;
                 do {
                     newPosition2 = randomDirection().toUnitVector().add(oldPosition);
@@ -285,7 +253,7 @@ public class GrassField {
                 }
             }
 
-            SamePositionAnimals newPositionAnimals = animals.getOrDefault(animal.getPosition(), new SamePositionAnimals(animal.getPosition(), animal, this));
+            SamePositionAnimals newPositionAnimals = animals.getOrDefault(animal.getPosition(), new SamePositionAnimals(animal.getPosition(), animal));
             newPositionAnimals.addAnimal(animal);
             animals.put(animal.getPosition(), newPositionAnimals);
             mapChanged("animal moved from : " + oldPosition + " to : " + animal.getPosition());
@@ -373,9 +341,7 @@ public class GrassField {
                 SamePositionAnimals samePositionAnimals = animals.get(animal.getPosition());
                 if(samePositionAnimals != null){
                     SamePositionAnimals animalsOnPosition = animals.get(animal.getPosition());
-                    Animal strongestAnimal = animalsOnPosition.getRandomStrongest();
-                    System.out.println(strongestAnimal.getId() + " najmocniejsze na pozycji " + strongestAnimal.getPosition());
-                    return strongestAnimal;
+                    return animalsOnPosition.getRandomStrongest();
                 }
                 return null;
             }
@@ -427,43 +393,28 @@ public class GrassField {
     }
 
     public synchronized List<Animal> reproduce(int genNumber, int minMutations, int maxMutations, int reproduceCost, int energyRequired) {
-        //System.out.println("map");
         List<Vector2d> animalsPositions = new ArrayList<>(animals.keySet());
         List<Animal> childs = new ArrayList<>();
 
         for (Vector2d position : animalsPositions) {
-            //System.out.println("for");
             SamePositionAnimals samePositionAnimals = animals.get(position);
 
             if (samePositionAnimals != null && !samePositionAnimals.getAnimals().isEmpty()) {
-                //System.out.println("if1");
                 List<Animal> animalsAtPosition = samePositionAnimals.getAnimals();
-                //System.out.println(animalsAtPosition.size() + "fff");
 
                 if (animalsAtPosition.size() > 1) {
-
-                    //System.out.println("if3");
                     animalsAtPosition = samePositionAnimals.findTwoStrongestAnimals();
-                    //System.out.println("if6");
                     Animal animal1 = animalsAtPosition.get(0);
                     Animal animal2 = animalsAtPosition.get(1);
-                    //System.out.println("if7");
                     if(animal1.getCurrentEnergy() >= energyRequired && animal2.getCurrentEnergy() >= energyRequired) {
-                        System.out.println(position);
                         int[] childGenType = GenoType.combineGenoType(genNumber, animal1, animal2, minMutations, maxMutations);
                         addGenotype(childGenType);
                         animal1.animalNewChild();
                         animal2.animalNewChild();
-                        //System.out.println("if5");
                         animal1.animalReprodueEnergyLost(reproduceCost);
                         animal2.animalReprodueEnergyLost(reproduceCost);
-                        //System.out.println("if10");
                         Animal child = new Animal(animal1.getPosition(), childGenType, 2 * reproduceCost, this, isSpecialGen, animal1, animal2 );
-                        //System.out.println("if11");
                         place(child);
-                        //System.out.println("if12");
-                        System.out.println(animalsObj.size() + "przed rozmnozeniem");
-                        System.out.println(animalsObj.size() + "po rozmnozeniu");
                         childs.add(child);
                         descendantsUpdate(child);
                     }
@@ -486,12 +437,9 @@ public class GrassField {
         visitedAnimals.add(child.getParent2());
 
         while(!queue.isEmpty()){
-            System.out.println(queue.size());
             Animal animal = queue.poll();
 
-
             if(animal.getParent1()!=null && !animal.getParent1().isVisited()){
-                System.out.println("b");
                 queue.add(animal.getParent1());
                 animal.getParent1().visited();
                 animal.getParent1().addNewDescendant();
@@ -499,7 +447,6 @@ public class GrassField {
             }
 
             if(animal.getParent2()!=null && !animal.getParent2().isVisited()){
-                System.out.println("c");
                 queue.add(animal.getParent2());
                 animal.getParent2().visited();
                 animal.getParent2().addNewDescendant();

@@ -1,9 +1,7 @@
 package agh.ics.oop;
-import agh.ics.oop.model.*;
 import agh.ics.oop.presenter.SimulationPresenter;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
@@ -15,20 +13,12 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SimulationApp extends Application {
 
     private BorderPane viewRoot;
     private FXMLLoader loader;
-
-    public int getSimulationNumber() {
-        return simulationNumber;
-    }
-
     private int simulationNumber = 0;
-
     public void start(Stage primaryStage) {
         configureStage(primaryStage);
         primaryStage.show();

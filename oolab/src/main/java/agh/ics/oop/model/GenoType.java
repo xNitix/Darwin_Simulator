@@ -13,7 +13,7 @@ public class GenoType {
     }
 
     public static int[] combineGenoType(int genNumber, Animal animal1, Animal animal2, int minMutations, int maxMutations){
-        //System.out.println("combine");
+
         int[] childGenes = new int[genNumber];
         int totalEnergy = animal1.getCurrentEnergy() + animal2.getCurrentEnergy();
 

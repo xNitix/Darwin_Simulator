@@ -15,12 +15,9 @@ public class SamePositionAnimals implements WorldElement {
 
     private final List<Animal> animals = Collections.synchronizedList(new ArrayList<>());
 
-    private final GrassField map;
-
-    public SamePositionAnimals(Vector2d position, Animal animal, GrassField map) {
+    public SamePositionAnimals(Vector2d position, Animal animal) {
         this.position = position;
         animals.add(animal);
-        this.map = map;
     }
 
     public synchronized void addAnimal(Animal animal){

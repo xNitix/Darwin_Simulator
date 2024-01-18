@@ -111,9 +111,7 @@ public class SimulationStatistics {
 
         for (Animal deadAnimal : simulation.getDeadAnimals()) {
             if (animals.contains(deadAnimal)) {
-                System.out.println(deadAnimal.getId() + " 2 ");
             } else {
-                System.out.println(deadAnimal.getId() + " 1 ");
                 animals.add(deadAnimal);
             }
         }
@@ -133,7 +131,4 @@ public class SimulationStatistics {
         return null;
     }
 
-    public int getDescendants(){
-        return selectedAnimal.getDescendantsNumber();
-    }
 }

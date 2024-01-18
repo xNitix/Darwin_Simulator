@@ -18,9 +18,7 @@ public class SimulationEngine {
     }
     public void runSync() {
         for (Simulation simulation : simulations) {
-            System.out.println("Start simulation ID:");
             simulation.run();
-            System.out.println("Simulation completed! \n");
         }
     }
 
