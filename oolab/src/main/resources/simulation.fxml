@@ -5,7 +5,9 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
 
+<?import javafx.scene.control.ListView?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             minHeight="550.0" minWidth="923.0"
@@ -68,6 +70,13 @@
 
                 <Label text="New plant per day"/>
                 <TextField fx:id="plantPerDayField" promptText="Enter how many plants should appear every day"/>
+
+                <RadioButton fx:id="statisticCSVButton" text="Save statistics to CSV" onAction="#onRadioButtonClickedCSV"/>
+
+                <Button text="Show Configurations" onAction="#showConfigurationsAlert"/>
+
+                <Button text="Save new configuration" onAction="#saveConfiguration"/>
+
             </VBox>
         </HBox>
     </center>

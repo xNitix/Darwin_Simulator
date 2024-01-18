@@ -132,4 +132,8 @@ public class SimulationStatistics {
 
         return null;
     }
+
+    public int getDate(){
+        return simulation.getDay();
+    }
 }

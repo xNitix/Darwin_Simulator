@@ -23,6 +23,10 @@ public class SimulationApp extends Application {
     private BorderPane viewRoot;
     private FXMLLoader loader;
 
+    public int getSimulationNumber() {
+        return simulationNumber;
+    }
+
     private int simulationNumber = 0;
 
     public void start(Stage primaryStage) {

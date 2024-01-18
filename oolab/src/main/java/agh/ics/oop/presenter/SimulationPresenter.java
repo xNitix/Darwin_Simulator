@@ -1,5 +1,6 @@
 package agh.ics.oop.presenter;
 import agh.ics.oop.Simulation;
+import agh.ics.oop.SimulationConfig;
 import agh.ics.oop.SimulationStatistics;
 import agh.ics.oop.model.*;
 import javafx.application.Platform;
@@ -16,7 +17,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-import java.awt.*;
+import java.io.*;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,8 +27,9 @@ import java.util.stream.Collectors;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-
 public class SimulationPresenter implements MapChangeListener {
+    @FXML
+    private RadioButton statisticCSVButton;
     @FXML
     private RadioButton madnessNextGenButton;
     @FXML
@@ -94,6 +98,8 @@ public class SimulationPresenter implements MapChangeListener {
     private Boolean isSpecial = false;
     private Boolean isSpecialGen = false;
 
+    private Boolean isCSVActive = false;
+
     private int genNumber;
 
     Image blackCat = new Image("file:oolab/src/main/resources/koty/kot1.png");
@@ -103,6 +109,10 @@ public class SimulationPresenter implements MapChangeListener {
     Image yellowCat = new Image("file:oolab/src/main/resources/koty/kot5.png");
     Image goodPlant = new Image("file:oolab/src/main/resources/koty/grass1.png");
     Image badPlant = new Image("file:oolab/src/main/resources/koty/grass2.png");
+
+    String folderPath = "oolab/src/main/resources/StatisticsCSV";
+
+    String filePath;
 
     public void setStatisticsGrid(GridPane statisticsGrid) {
         this.statisticsGrid = statisticsGrid;
@@ -313,12 +323,16 @@ public class SimulationPresenter implements MapChangeListener {
 
     }
 
+    private int simulationDay= -1;
     @Override
     public void mapChanged(GrassField worldMap, String message) {
         Platform.runLater(() -> {
             drawMap();
             description.setText(message);
-            updateStatistics();
+            if(statistics.getDay() != simulationDay){
+                updateStatistics();
+                simulationDay = statistics.getDay();
+            }
         });
     }
 
@@ -353,6 +367,9 @@ public class SimulationPresenter implements MapChangeListener {
                 simulationEngine.addSimulation(simulation);
 
             }
+            if(isCSVActive){
+                newFile();
+            }
         } catch (NumberFormatException e) {
             // tu tez
         }
@@ -373,6 +390,7 @@ public class SimulationPresenter implements MapChangeListener {
     }
 
     public void initialize() {
+        statisticCSVButton.setSelected(false);
         radioGroup = new ToggleGroup();
         poisonedFruitRadioButton.setToggleGroup(radioGroup);
         forestedEquatorRadioButton.setToggleGroup(radioGroup);
@@ -457,22 +475,27 @@ public class SimulationPresenter implements MapChangeListener {
     public void updateStatistics() {
 
         int animalCount = statistics.getNumberOfInsistingAnimals();
-        double daysAlive = statistics.getAvgDaysAlive();
+        double daysAlive = (double) Math.round(statistics.getAvgDaysAlive()* 100) /100;
         int plantCount = statistics.getPlantsCount();
         int freeFieldsCount = statistics.getFreeFieldsCount();
-        double liveAnimalsAvgEnergy = statistics.getLiveAnimalsAvgEnergy();
-        double liveAnimalsChildAvg = statistics.getAliveAnimalsChildAvg();
+        double liveAnimalsAvgEnergy = (double) Math.round(statistics.getLiveAnimalsAvgEnergy() * 100) /100;
+        double liveAnimalsChildAvg = (double) Math.round(statistics.getAliveAnimalsChildAvg()* 100)/100;
         int[] mostFamousGenoType = statistics.getDominantGenoType();
 
         animalCountLabel.setText("Animal Count: " + animalCount);
         plantCountLabel.setText("Plant Count: " + plantCount);
-        daysAliveLabel.setText("Average Dead Animals Life Length: " + daysAlive);
         freeFieldCountLabel.setText("Free Fields Count: " + freeFieldsCount);
-        liveAnimalsAvgEnergyLabel.setText("Alive Animals AVG Energy: " + liveAnimalsAvgEnergy);
-        liveAnimalsChildAvgLabel.setText("Alive Animals Child AVG: " + liveAnimalsChildAvg);
         mostFamounsGenoTypeLabel.setText("Famous Genotype: " + Arrays.toString(mostFamousGenoType));
+        liveAnimalsAvgEnergyLabel.setText("Alive Animals AVG Energy: " + liveAnimalsAvgEnergy);
+        daysAliveLabel.setText("Average Dead Animals Life Length: " + daysAlive);
+        liveAnimalsChildAvgLabel.setText("Alive Animals Child AVG: " + liveAnimalsChildAvg);
         updateChart();
         updateSelectedAnimalStats(statistics.getSelectedAnimal());
+        if(isCSVActive){
+            String[] row = {String.valueOf(statistics.getDay()), String.valueOf(animalCount), String.valueOf(plantCount), String.valueOf(freeFieldsCount),
+                    Arrays.toString(mostFamousGenoType), String.valueOf(liveAnimalsAvgEnergy), String.valueOf(daysAlive),String.valueOf(liveAnimalsChildAvg)};
+            appendToCSV(filePath,row);
+        }
     }
     public SimulationStatistics getSimulationStatistics() {
         return statistics;
@@ -620,4 +643,164 @@ public class SimulationPresenter implements MapChangeListener {
             mapAndTrack.getChildren().addAll(mapGrid, animalStatsBox);
         }
     }
+
+    public void onRadioButtonClickedCSV() {
+        if (statisticCSVButton.isSelected()) {
+            isCSVActive = true;
+        }
+    }
+
+    private void newFile(){
+        String[] headers = {"Day", "Animals Count", "Plants Count", "Free fields count", "Famous Genotype", "AVG energy for living animals", "AVG dead animals life length", "AVG child count"};
+        String fileName = generateFileName();
+        this.filePath = Paths.get(folderPath, fileName).toString();
+        writeCSV(filePath, headers);
+    }
+
+    private static String generateFileName() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        return "statistics_" + dateFormat.format(new Date()) + ".csv";
+    }
+
+    // Method to write CSV file with headers
+    private static void writeCSV(String filePath, String[] headers) {
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath)))) {
+            writer.println(String.join(";", headers));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to append data to an existing CSV file
+    private static void appendToCSV(String filePath, String[] data) {
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath, true)))) {
+            writer.println(String.join(";", data));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<SimulationConfig> configurations;
+
+    public void showConfigurationsAlert(ActionEvent actionEvent) {
+        loadConfigurationsFromProperties();
+
+        List<String> configurationTitles = new ArrayList<>();
+        for (SimulationConfig config : configurations) {
+            configurationTitles.add(config.getTitle());
+        }
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(null, configurationTitles);
+        dialog.setTitle("Select Configuration");
+        dialog.setHeaderText("Choose a configuration:");
+        dialog.setContentText("Configuration:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(selectedConfigTitle -> {
+            SimulationConfig selectedConfig = findConfigByTitle(selectedConfigTitle);
+            updateSelectedConfigStats(selectedConfig);
+        });
+    }
+
+    private SimulationConfig findConfigByTitle(String title) {
+        return configurations.stream()
+                .filter(config -> config.getTitle().equals(title))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void updateSelectedConfigStats(SimulationConfig selectedConfig) {
+        animalNumber.setText(selectedConfig.getAnimalNumber());
+        genNumberField.setText(selectedConfig.getGenNumberField());
+        startEnergyField.setText(selectedConfig.getStartEnergyField());
+        widthField.setText(selectedConfig.getWidthField());
+        heightField.setText(selectedConfig.getHeightField());
+        grassQuantityField.setText(selectedConfig.getGrassQuantityField());
+        energyEatField.setText(selectedConfig.getEnergyEatField());
+        moveEnergyCost.setText(selectedConfig.getMoveEnergyCost());
+        plantPerDayField.setText(selectedConfig.getPlantPerDayField());
+        reproduceEnergyField.setText(selectedConfig.getReproduceEnergyField());
+        reproduceEnergyLostField.setText(selectedConfig.getReproduceEnergyLostField());
+        minMutationsField.setText(selectedConfig.getMinMutationsField());
+        maxMutationsField.setText(selectedConfig.getMinMutationsField());
+        isSpecial = (Boolean.parseBoolean(selectedConfig.getPoisonedFruitRadioButton()));
+        isSpecialGen = (Boolean.parseBoolean(selectedConfig.getMadnessNextGenButton()));
+        forestedEquatorRadioButton.setSelected(Boolean.parseBoolean(selectedConfig.getForestedEquatorRadioButton()));
+        poisonedFruitRadioButton.setSelected(Boolean.parseBoolean(selectedConfig.getPoisonedFruitRadioButton()));
+        madnessNextGenButton.setSelected(Boolean.parseBoolean(selectedConfig.getMadnessNextGenButton()));
+        normalNextGenButton.setSelected(Boolean.parseBoolean(selectedConfig.getNormalNextGenButton()));
+        statisticCSVButton.setSelected(Boolean.parseBoolean(selectedConfig.getStatisticCSVButton()));
+        isCSVActive = Boolean.parseBoolean(selectedConfig.getStatisticCSVButton());
+    }
+
+    public void saveConfiguration() {
+        Properties properties = new Properties();
+        String configurationsFolderPath = "oolab/src/main/resources/Configurations";
+
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("New property file");
+        dialog.setHeaderText("Enter new configuration title:");
+        dialog.setContentText("Title: ");
+        Optional<String> result = dialog.showAndWait();
+
+        String newConfigFileName;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        if (result.isEmpty()) {
+            properties.setProperty("title", dateFormat.format(new Date() + ".properties"));
+            newConfigFileName = dateFormat.format(new Date()) + ".properties";
+        } else {
+            properties.setProperty("title", result.get() + ".properties");
+            newConfigFileName = result.get() + ".properties";
+        }
+
+        properties.setProperty("animalNumber", animalNumber.getText());
+        properties.setProperty("genNumberField", genNumberField.getText());
+        properties.setProperty("startEnergyField",startEnergyField.getText());
+        properties.setProperty("widthField",  widthField.getText());
+        properties.setProperty("heightField", heightField.getText());
+        properties.setProperty("grassQuantityField", grassQuantityField.getText());
+        properties.setProperty("energyEatField",  energyEatField.getText());
+        properties.setProperty("moveEnergyCost",   moveEnergyCost.getText());
+        properties.setProperty("plantPerDayField", plantPerDayField.getText());
+        properties.setProperty("reproduceEnergyField",  reproduceEnergyField.getText());
+        properties.setProperty("reproduceEnergyLostField", reproduceEnergyLostField.getText());
+        properties.setProperty("minMutationsField", minMutationsField.getText());
+        properties.setProperty("maxMutationsField", maxMutationsField.getText());
+        properties.setProperty("poisonedFruitRadioButton", isSpecial ? "true" : "false");
+        properties.setProperty("madnessNextGenButton", isSpecialGen ? "true" : "false");
+        properties.setProperty("forestedEquatorRadioButton", isSpecial ? "false" : "true");
+        properties.setProperty("normalNextGenButton", isSpecialGen ? "false" : "true");
+        properties.setProperty("statisticCSVButton", isCSVActive ? "true" : "false");
+
+        try (FileWriter fileWriter = new FileWriter(configurationsFolderPath + File.separator + newConfigFileName)) {
+            properties.store(fileWriter, "New configuration");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadConfigurationsFromProperties() {
+        configurations = new ArrayList<>();
+
+        File folder = new File("oolab/src/main/resources/Configurations");
+        File[] configFiles = folder.listFiles();
+
+        if (configFiles != null) {
+            for (File configFile : configFiles) {
+                if (configFile.isFile() && configFile.getName().endsWith(".properties")) {
+                    try (InputStream input = new FileInputStream(configFile)) {
+                        Properties properties = new Properties();
+                        properties.load(input);
+                        SimulationConfig config = new SimulationConfig(properties);
+                        configurations.add(config);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
 }
