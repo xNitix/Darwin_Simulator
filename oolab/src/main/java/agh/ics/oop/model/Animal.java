@@ -3,6 +3,42 @@ package agh.ics.oop.model;
 import java.util.Random;
 
 public class Animal implements WorldElement{
+    public synchronized boolean isVisited() {
+        return isVisited;
+    }
+
+    public synchronized void visited(){
+        isVisited=true;
+    }
+
+    public synchronized void resetVisited(){
+        isVisited=false;
+    }
+
+    private boolean isVisited = false;
+
+    public int getDescendantsNumber() {
+        return descendantsNumber;
+    }
+
+    public synchronized void addNewDescendant(){
+        descendantsNumber ++;
+    }
+
+    private int descendantsNumber = 0;
+
+    public Animal getParent1() {
+        return parent1;
+    }
+
+    private Animal parent1 = null;
+
+    public Animal getParent2() {
+        return parent2;
+    }
+
+    private Animal parent2 = null;
+
     private MapDirection currentOrientation;
     private Vector2d position;
 
@@ -62,6 +98,27 @@ public class Animal implements WorldElement{
     }
 
     private final int id;
+
+    public Animal(Vector2d position, int[] genoType, int currentEnergy, GrassField map, Boolean madness, Animal parent1, Animal parent2)
+    {
+        this.madness = madness;
+        this.id = nextId;
+        nextId++;
+        Random random = new Random();
+        this.position = position;
+        this.currentOrientation = MapDirection.NORTH;
+        this.genoType = genoType;
+        this.currentEnergy = currentEnergy;
+        this.startEnergy = currentEnergy;
+        this.map = map;
+        this.whichGen = random.nextInt(genoType.length-1);
+        if(madness){
+            addSomeMadness();
+            System.out.println("dodano madness");
+        }
+        this.parent1=parent1;
+        this.parent2=parent2;
+    }
 
 
     public Animal(Vector2d position, int[] genoType, int currentEnergy, GrassField map, Boolean madness)

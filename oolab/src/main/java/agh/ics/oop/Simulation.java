@@ -98,7 +98,7 @@ public class Simulation implements Runnable{
                 //System.out.println("tu6");
                 day++;
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(200);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

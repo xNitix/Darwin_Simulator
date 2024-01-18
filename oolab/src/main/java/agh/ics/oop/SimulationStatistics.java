@@ -133,7 +133,7 @@ public class SimulationStatistics {
         return null;
     }
 
-    public int getDate(){
-        return simulation.getDay();
+    public int getDescendants(){
+        return selectedAnimal.getDescendantsNumber();
     }
 }

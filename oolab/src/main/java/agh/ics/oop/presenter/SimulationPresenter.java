@@ -635,9 +635,9 @@ public class SimulationPresenter implements MapChangeListener {
             } else {
                 lifeStatus.setText("Death day: " + selectedAnimal.getDeathDay());
             }
+            Label descendants = new Label("Number of descendants: " + selectedAnimal.getDescendantsNumber());
 
-
-            animalStatsBox.getChildren().addAll(animalInfoLabel, idLabel, positionLabel, genoType, activeGen, energyLabel, grassEatenCounter, childCount, lifeStatus);
+            animalStatsBox.getChildren().addAll(animalInfoLabel, idLabel, positionLabel, genoType, activeGen, energyLabel, grassEatenCounter, childCount, lifeStatus, descendants);
 
             mapAndTrack.getChildren().clear();
             mapAndTrack.getChildren().addAll(mapGrid, animalStatsBox);

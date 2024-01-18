@@ -6,6 +6,8 @@ import java.util.*;
 
 import static agh.ics.oop.model.MapDirection.randomDirection;
 
+import java.util.Queue;
+
 public class GrassField {
     private final Map<Vector2d, FieldType> fieldTypes = new HashMap<>();
 
@@ -456,19 +458,62 @@ public class GrassField {
                         animal1.animalReprodueEnergyLost(reproduceCost);
                         animal2.animalReprodueEnergyLost(reproduceCost);
                         //System.out.println("if10");
-                        Animal child = new Animal(animal1.getPosition(), childGenType, 2 * reproduceCost, this, isSpecialGen );
+                        Animal child = new Animal(animal1.getPosition(), childGenType, 2 * reproduceCost, this, isSpecialGen, animal1, animal2 );
                         //System.out.println("if11");
                         place(child);
                         //System.out.println("if12");
                         System.out.println(animalsObj.size() + "przed rozmnozeniem");
                         System.out.println(animalsObj.size() + "po rozmnozeniu");
                         childs.add(child);
-                        //System.out.println("if13");
+                        descendantsUpdate(child);
                     }
                 }
             }
         }
         return childs;
+    }
+
+    private synchronized void descendantsUpdate(Animal child) {
+        List<Animal> visitedAnimals = new ArrayList<>();
+        Queue<Animal> queue = new LinkedList<>();
+        queue.add(child.getParent1());
+        queue.add(child.getParent2());
+        child.getParent1().visited();
+        child.getParent2().visited();
+        child.getParent1().addNewDescendant();
+        child.getParent2().addNewDescendant();
+        visitedAnimals.add(child.getParent1());
+        visitedAnimals.add(child.getParent2());
+
+        while(!queue.isEmpty()){
+            System.out.println(queue.size());
+            Animal animal = queue.poll();
+
+
+            if(animal.getParent1()!=null && !animal.getParent1().isVisited()){
+                System.out.println("b");
+                queue.add(animal.getParent1());
+                animal.getParent1().visited();
+                animal.getParent1().addNewDescendant();
+                visitedAnimals.add(animal.getParent1());
+            }
+
+            if(animal.getParent2()!=null && !animal.getParent2().isVisited()){
+                System.out.println("c");
+                queue.add(animal.getParent2());
+                animal.getParent2().visited();
+                animal.getParent2().addNewDescendant();
+                visitedAnimals.add(animal.getParent2());
+            }
+
+
+        }
+
+        for(Animal animal : visitedAnimals){
+            animal.resetVisited();
+        }
+
+
     }
 
     private void addGenotype(int[] newGenotype) {
