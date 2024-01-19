@@ -1,7 +1,6 @@
 package agh.ics.oop;
 
 import agh.ics.oop.model.*;
-import agh.ics.oop.model.Exceptions.PositionAlreadyOccupiedException;
 
 import java.util.ArrayList;
 import java.util.*;
@@ -53,7 +52,7 @@ public class Simulation implements Runnable{
         this.genNumber = genNumber;
         for(Vector2d position : initialPositions){
             int[] genes = GenoType.createRandomGenoType(genNumber);
-            Animal currAnimal = new Animal(position,genes,startEnergy,map,isSpecialGen);
+            Animal currAnimal = new Animal(position,genes,startEnergy,isSpecialGen);
             map.place(currAnimal);
         }
         this.map = map;
@@ -72,6 +71,7 @@ public class Simulation implements Runnable{
                 animalsReproduce();
                 map.makeGrassMap(plantPerDay);
                 day++;
+                map.updateDrawMap();
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {

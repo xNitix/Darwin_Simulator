@@ -43,11 +43,6 @@ public class SamePositionAnimals implements WorldElement {
     }
 
     @Override
-    public boolean isAt(Vector2d position) {
-        return false;
-    }
-
-    @Override
     public Vector2d getPosition() {
         return position;
     }

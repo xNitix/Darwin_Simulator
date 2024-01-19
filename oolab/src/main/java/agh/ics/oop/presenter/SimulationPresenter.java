@@ -105,7 +105,7 @@ public class SimulationPresenter implements MapChangeListener {
     Image blackCat = new Image("file:oolab/src/main/resources/koty/kot1.png");
     Image grayCat = new Image("file:oolab/src/main/resources/koty/kot2.png");
     Image redCat = new Image("file:oolab/src/main/resources/koty/kot3.png");
-    Image orangekCat = new Image("file:oolab/src/main/resources/koty/kot4.png");
+    Image orangeCat = new Image("file:oolab/src/main/resources/koty/kot4.png");
     Image yellowCat = new Image("file:oolab/src/main/resources/koty/kot5.png");
     Image goodPlant = new Image("file:oolab/src/main/resources/koty/grass1.png");
     Image badPlant = new Image("file:oolab/src/main/resources/koty/grass2.png");
@@ -282,7 +282,7 @@ public class SimulationPresenter implements MapChangeListener {
                         imageView.setFitHeight(cellSize);
                         mapGrid.add(imageView, x, numRows - y);
                     }else if((double)energy/startEnergy*100 <= 40 && (double)energy/startEnergy*100 > 20){
-                        ImageView imageView = new ImageView(orangekCat);
+                        ImageView imageView = new ImageView(orangeCat);
                         imageView.setFitWidth(cellSize);
                         imageView.setFitHeight(cellSize);
                         mapGrid.add(imageView, x, numRows - y);
@@ -301,10 +301,9 @@ public class SimulationPresenter implements MapChangeListener {
 
     private int simulationDay= -1;
     @Override
-    public void mapChanged(GrassField worldMap, String message) {
+    public void mapChanged(GrassField worldMap) {
         Platform.runLater(() -> {
             drawMap();
-            description.setText(message);
             if(statistics.getDay() != simulationDay){
                 updateStatistics();
                 simulationDay = statistics.getDay();
@@ -510,7 +509,7 @@ public class SimulationPresenter implements MapChangeListener {
         legendData.put(blackCat, "Above 80% energy");
         legendData.put(grayCat, "60% - 80% energy");
         legendData.put(redCat, "40% - 60% energy");
-        legendData.put(orangekCat, "20% - 40% energy");
+        legendData.put(orangeCat, "20% - 40% energy");
         legendData.put(yellowCat, "Below 20% energy");
         legendData.put(goodPlant, "Plant");
         if(isSpecial){
@@ -597,7 +596,7 @@ public class SimulationPresenter implements MapChangeListener {
             Label positionLabel = new Label("Position: " + selectedAnimal.getPosition());
             positionLabel.setStyle("-fx-font-weight: bold;");
             Label genoType = new Label("Genotype: " + Arrays.toString(selectedAnimal.getGenoType()));
-            Label activeGen = new Label("Active gen: " + selectedAnimal.getGenoType()[selectedAnimal.getWhichGen()]);
+            Label activeGen = new Label("Active gen: " + selectedAnimal.getGenoType()[selectedAnimal.getWhichGenIsActive()]);
             Label energyLabel = new Label("Energy: " + selectedAnimal.getCurrentEnergy());
             Label grassEatenCounter = new Label("Eaten grass counter: " + selectedAnimal.getGrassEatenCounter());
             Label childCount = new Label("Child counter: " + selectedAnimal.getChildNumber());

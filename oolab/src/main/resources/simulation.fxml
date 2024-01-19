@@ -45,8 +45,6 @@
                 <Label text="Maximum number of mutations"/>
                 <TextField fx:id="maxMutationsField" promptText="Enter Maximum number of mutations"/>
 
-                <Label fx:id="description"/>
-
             </VBox>
             <VBox spacing="8">
                 <Label text="Map Options" style="-fx-font-size: 15; -fx-font-weight: bold;"/>

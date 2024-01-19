@@ -1,88 +1,32 @@
 package agh.ics.oop.model;
-
 import agh.ics.oop.model.util.MapVisualizer;
-
 import java.util.*;
-
 import static agh.ics.oop.model.MapDirection.randomDirection;
-
 import java.util.Queue;
-
 public class GrassField {
     private final Map<Vector2d, FieldType> fieldTypes = new HashMap<>();
 
-    protected final Map<Vector2d, SamePositionAnimals> animals = Collections.synchronizedMap(new HashMap<>());
+    private final Map<Vector2d, SamePositionAnimals> animals = Collections.synchronizedMap(new HashMap<>());
+
     private final Map<Vector2d, WorldElement> grasses = Collections.synchronizedMap(new HashMap<>());
 
-    public ArrayList<Animal> animalsObj = new ArrayList<>();
+    private Map<int[],Integer> mapGenotypes = new HashMap<>();
 
-    public List<WorldElement> getGrassesObj() {
-        return grassesObj;
-    }
+    private ArrayList<Animal> animalsObj = new ArrayList<>();
 
     private final List<WorldElement> grassesObj = Collections.synchronizedList(new ArrayList<>());
+
     private final Vector2d leftDownGrass;
+
     private final Vector2d rightUpGrass;
+
     protected List<MapChangeListener> listeners = new ArrayList<>();
+
     protected final MapVisualizer mapVisualizer = new MapVisualizer(this);
-    protected final UUID id = UUID.randomUUID();
 
     private final Boolean isSpecial;
+
     private final Boolean isSpecialGen;
-    public synchronized ArrayList<Animal> getAnimalsObj() {
-        return animalsObj;
-    }
-
-    public Map<int[], Integer> getMapGenotypes() {
-        return mapGenotypes;
-    }
-
-    public Map<int[],Integer> mapGenotypes = new HashMap<>();
-
-
-
-    public void subscribe(MapChangeListener listener)
-    {
-        listeners.add(listener);
-    }
-
-    public void unSubscribe(MapChangeListener listener)
-    {
-        listeners.remove(listener);
-    }
-
-    protected void mapChanged(String message){
-        for(MapChangeListener listener : listeners){
-            listener.mapChanged(this,message);
-        }
-    }
-
-    public synchronized void place(Animal animal) {
-        addAnimalToMap(animal, animal.getPosition());
-        mapChanged("animal placed : " + animal.getPosition());
-        animalsObj.add(animal);
-        addGenotype(animal.getGenoType());
-    }
-
-    public synchronized void addAnimalToMap(Animal animal, Vector2d position){
-        if(!animals.containsKey(position)){
-            SamePositionAnimals samePositionAnimals = new SamePositionAnimals(position,animal);
-            animals.put(position, samePositionAnimals);
-        } else {
-            animals.get(position).addAnimal(animal);
-        }
-    }
-
-    public boolean isOccupied(Vector2d position) {
-        return animals.containsKey((position)) || grasses.containsKey(position);
-    }
-
-
-    @Override
-    public String toString() {
-        Boundary boundary = getCurrentBounds();
-        return mapVisualizer.draw(boundary.leftDown(),boundary.rightUp());
-    }
 
     public GrassField(int grassFilesQuantity, int width, int height, Boolean isSpecial, Boolean isSpecialGen) {
         this.isSpecial = isSpecial;
@@ -90,11 +34,56 @@ public class GrassField {
         leftDownGrass = new Vector2d(0,0);
         rightUpGrass = new Vector2d(width-1,height-1);
         if(isSpecial){
-            initializeSpecialFieldTypes();
+            initializeSpecialFieldTypes(); // wariant F
         } else {
             initializeFieldTypes();
         }
         makeGrassMap(grassFilesQuantity);
+    }
+
+    //generate methods
+    public void makeGrassMap(int quantity){
+        int addedGrass = 0;
+        List<Vector2d> preferredPositions = freeJunglePosition();
+        Collections.shuffle(preferredPositions);
+        List<Vector2d> unattractivePositions = freeStepPosition();
+        Collections.shuffle(unattractivePositions);
+
+        while(addedGrass < quantity && !isMapFullOfGrass() && (!preferredPositions.isEmpty() || !unattractivePositions.isEmpty())) {
+            double grassProbability = Math.random();
+            Vector2d newPosition;
+            boolean isNewFieldPrefered = false;
+            if(grassProbability <= 0.8 && !preferredPositions.isEmpty() && !unattractivePositions.isEmpty()) {
+                newPosition = preferredPositions.remove(0);
+                isNewFieldPrefered = true;
+            } else if(grassProbability > 0.8 && !preferredPositions.isEmpty() && !unattractivePositions.isEmpty()) {
+                newPosition = unattractivePositions.remove(0);
+            } else if(!unattractivePositions.isEmpty()) {
+                newPosition = unattractivePositions.remove(0);
+            } else {
+                newPosition = preferredPositions.remove(0);
+                isNewFieldPrefered = true;
+            }
+            if(isSpecial && isNewFieldPrefered){
+                Random random = new Random();
+                double chance = random.nextDouble();
+
+                if(chance < 0.25) {
+                    BadGrass newGrass = new BadGrass(newPosition);
+                    grasses.put(newPosition, newGrass);
+                    grassesObj.add(newGrass);
+                } else {
+                    Grass newGrass = new Grass(newPosition);
+                    grasses.put(newPosition, newGrass);
+                    grassesObj.add(newGrass);
+                }
+            } else {
+                Grass newGrass = new Grass(newPosition);
+                grasses.put(newPosition, newGrass);
+                grassesObj.add(newGrass);
+            }
+            addedGrass++;
+        }
     }
 
     private void initializeFieldTypes() {
@@ -130,17 +119,8 @@ public class GrassField {
                 if(added == 0){
                     fieldTypes.put(new Vector2d(x,y),FieldType.UNATTRACTIVE);
                 }
-
             }
         }
-    }
-
-    private double getPreferredProbability(int row) {
-        double middleRow = rightUpGrass.getX() / 2.0;
-        double distanceFromMiddle = Math.abs(middleRow - row);
-        double normalizedDistance = distanceFromMiddle / middleRow;
-        double standardDeviation = 0.2;
-        return Math.exp(-Math.pow(normalizedDistance, 2) / (2 * Math.pow(standardDeviation, 2)));
     }
 
     private void initializeSpecialFieldTypes() {
@@ -171,58 +151,27 @@ public class GrassField {
         }
     }
 
+    private double getPreferredProbability(int row) {
+        double middleRow = rightUpGrass.getX() / 2.0;
+        double distanceFromMiddle = Math.abs(middleRow - row);
+        double normalizedDistance = distanceFromMiddle / middleRow;
+        double standardDeviation = 0.2;
+        return Math.exp(-Math.pow(normalizedDistance, 2) / (2 * Math.pow(standardDeviation, 2)));
+    }
 
-    public void makeGrassMap(int quantity){
-        int addedGrass = 0;
-        List<Vector2d> preferredPositions = freeJunglePosition();
-        Collections.shuffle(preferredPositions);
-        List<Vector2d> unattractivePositions = freeStepPosition();
-        Collections.shuffle(unattractivePositions);
-
-        while(addedGrass < quantity && !isMapFullOfGrass() && (!preferredPositions.isEmpty() || !unattractivePositions.isEmpty())) {
-            double grassProbability = Math.random();
-
-            Vector2d newPosition;
-            boolean isNewFieldPrefered = false;
-            if(grassProbability <= 0.8 && !preferredPositions.isEmpty() && !unattractivePositions.isEmpty()) {
-                newPosition = preferredPositions.remove(0);
-                isNewFieldPrefered = true;
-            } else if(grassProbability > 0.8 && !preferredPositions.isEmpty() && !unattractivePositions.isEmpty()) {
-                newPosition = unattractivePositions.remove(0);
-            } else if(!unattractivePositions.isEmpty()) {
-                newPosition = unattractivePositions.remove(0);
-            } else {
-                newPosition = preferredPositions.remove(0);
-                isNewFieldPrefered = true;
-            }
-
-            if(isSpecial && isNewFieldPrefered){
-                Random random = new Random();
-                double chance = random.nextDouble();
-
-                if (chance < 0.25) {
-                    BadGrass newGrass = new BadGrass(newPosition);
-                    grasses.put(newPosition, newGrass);
-                    grassesObj.add(newGrass);
-                    addedGrass++;
-                } else {
-                    Grass newGrass = new Grass(newPosition);
-                    grasses.put(newPosition, newGrass);
-                    grassesObj.add(newGrass);
-                    addedGrass++;
-                }
-            } else {
-                Grass newGrass = new Grass(newPosition);
-                grasses.put(newPosition, newGrass);
-                grassesObj.add(newGrass);
-                addedGrass++;
-            }
+    public synchronized void addAnimalToMap(Animal animal, Vector2d position){
+        if(!animals.containsKey(position)){
+            SamePositionAnimals samePositionAnimals = new SamePositionAnimals(position,animal);
+            animals.put(position, samePositionAnimals);
+        } else {
+            animals.get(position).addAnimal(animal);
         }
     }
 
-
-    public Boundary getCurrentBounds() {
-        return new Boundary(leftDownGrass,rightUpGrass);
+    public synchronized void place(Animal animal) {
+        addAnimalToMap(animal, animal.getPosition());
+        animalsObj.add(animal);
+        addGenotype(animal.getGenoType());
     }
 
     public synchronized void move(Animal animal, int energyCost) {
@@ -242,8 +191,8 @@ public class GrassField {
                 newPosition = newPosition2;
             }
         }
-
         animal.move(energyCost, newPosition);
+
         if (!oldPosition.equals(animal.getPosition())) {
             SamePositionAnimals oldPositionAnimals = animals.get(oldPosition);
             if (oldPositionAnimals != null) {
@@ -252,13 +201,9 @@ public class GrassField {
                     animals.remove(oldPosition);
                 }
             }
-
             SamePositionAnimals newPositionAnimals = animals.getOrDefault(animal.getPosition(), new SamePositionAnimals(animal.getPosition(), animal));
             newPositionAnimals.addAnimal(animal);
             animals.put(animal.getPosition(), newPositionAnimals);
-            mapChanged("animal moved from : " + oldPosition + " to : " + animal.getPosition());
-        }else{
-            mapChanged("animal in position: " + oldPosition + " changed its orientation to: " + animal.getCurrentOrientation());
         }
     }
 
@@ -285,10 +230,6 @@ public class GrassField {
 
     private boolean isOutOfBounds(Vector2d newPosition) {
         return !(newPosition.follows(leftDownGrass) && newPosition.precedes(rightUpGrass));
-    }
-
-    public FieldType getFieldType(Vector2d positionToCheck){
-        return fieldTypes.get(positionToCheck);
     }
 
     public boolean isMapFullOfGrass(){
@@ -373,7 +314,6 @@ public class GrassField {
                 }
             }
         }
-        mapChanged("zjedzono rosline");
     }
 
     public synchronized void removeAnimalFromMap(Animal animalToRemove) {
@@ -392,9 +332,8 @@ public class GrassField {
        animalsObj.remove(animalToRemove);
     }
 
-    public synchronized List<Animal> reproduce(int genNumber, int minMutations, int maxMutations, int reproduceCost, int energyRequired) {
+    public synchronized void reproduce(int genNumber, int minMutations, int maxMutations, int reproduceCost, int energyRequired) {
         List<Vector2d> animalsPositions = new ArrayList<>(animals.keySet());
-        List<Animal> childs = new ArrayList<>();
 
         for (Vector2d position : animalsPositions) {
             SamePositionAnimals samePositionAnimals = animals.get(position);
@@ -411,17 +350,15 @@ public class GrassField {
                         addGenotype(childGenType);
                         animal1.animalNewChild();
                         animal2.animalNewChild();
-                        animal1.animalReprodueEnergyLost(reproduceCost);
-                        animal2.animalReprodueEnergyLost(reproduceCost);
-                        Animal child = new Animal(animal1.getPosition(), childGenType, 2 * reproduceCost, this, isSpecialGen, animal1, animal2 );
+                        animal1.animalReproduceEnergyLost(reproduceCost);
+                        animal2.animalReproduceEnergyLost(reproduceCost);
+                        Animal child = new Animal(animal1.getPosition(), childGenType, 2 * reproduceCost, isSpecialGen, animal1, animal2 );
                         place(child);
-                        childs.add(child);
                         descendantsUpdate(child);
                     }
                 }
             }
         }
-        return childs;
     }
 
     private synchronized void descendantsUpdate(Animal child) {
@@ -429,8 +366,6 @@ public class GrassField {
         Queue<Animal> queue = new LinkedList<>();
         queue.add(child.getParent1());
         queue.add(child.getParent2());
-        child.getParent1().visited();
-        child.getParent2().visited();
         child.getParent1().addNewDescendant();
         child.getParent2().addNewDescendant();
         visitedAnimals.add(child.getParent1());
@@ -439,27 +374,18 @@ public class GrassField {
         while(!queue.isEmpty()){
             Animal animal = queue.poll();
 
-            if(animal.getParent1()!=null && !animal.getParent1().isVisited()){
+            if(animal.getParent1()!=null && !visitedAnimals.contains(animal.getParent1())){
                 queue.add(animal.getParent1());
-                animal.getParent1().visited();
                 animal.getParent1().addNewDescendant();
                 visitedAnimals.add(animal.getParent1());
             }
 
-            if(animal.getParent2()!=null && !animal.getParent2().isVisited()){
+            if(animal.getParent2()!=null && !visitedAnimals.contains(animal.getParent2())){
                 queue.add(animal.getParent2());
-                animal.getParent2().visited();
                 animal.getParent2().addNewDescendant();
                 visitedAnimals.add(animal.getParent2());
             }
-
-
         }
-
-        for(Animal animal : visitedAnimals){
-            animal.resetVisited();
-        }
-
 
     }
 
@@ -475,6 +401,50 @@ public class GrassField {
             }
         }
         mapGenotypes.put(newGenotype,1);
+    }
+
+    public void subscribe(MapChangeListener listener)
+    {
+        listeners.add(listener);
+    }
+
+    public void unSubscribe(MapChangeListener listener)
+    {
+        listeners.remove(listener);
+    }
+
+    protected void mapChanged(){
+        for(MapChangeListener listener : listeners){
+            listener.mapChanged(this);
+        }
+    }
+
+    public FieldType getFieldType(Vector2d positionToCheck){
+        return fieldTypes.get(positionToCheck);
+    }
+
+    public void updateDrawMap(){
+        mapChanged();
+    }
+
+    public Boundary getCurrentBounds() {
+        return new Boundary(leftDownGrass,rightUpGrass);
+    }
+    public synchronized ArrayList<Animal> getAnimalsObj() {
+        return animalsObj;
+    }
+
+    public Map<int[], Integer> getMapGenotypes() {
+        return mapGenotypes;
+    }
+
+    public List<WorldElement> getGrassesObj() {
+        return grassesObj;
+    }
+    @Override
+    public String toString() {
+        Boundary boundary = getCurrentBounds();
+        return mapVisualizer.draw(boundary.leftDown(),boundary.rightUp());
     }
 
 }
