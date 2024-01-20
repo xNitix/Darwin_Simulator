@@ -16,14 +16,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
 import java.io.*;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -64,8 +62,8 @@ public class SimulationPresenter implements MapChangeListener {
     private TextField widthField;
     @FXML
     private TextField genNumberField;
-    @FXML
-    private Label description;
+
+    private Button trackButton;
 
     public void setMapGrid(GridPane mapGrid) {
         Platform.runLater(() -> {
@@ -78,7 +76,7 @@ public class SimulationPresenter implements MapChangeListener {
 
     @FXML
     private VBox mapAndTrack;
-    private GrassField worldMap;
+    private AbstractWorldMap worldMap;
     private int cellSize = 280;
     private int startEnergy;
     private int moveCost;
@@ -176,7 +174,6 @@ public class SimulationPresenter implements MapChangeListener {
     @FXML
     private VBox legendContainer;
 
-    @FXML
     private Button dominantButton;
 
     public void setLineChart(LineChart<Number, Number> lineChart) {
@@ -201,7 +198,7 @@ public class SimulationPresenter implements MapChangeListener {
     }
 
 
-    public void setWorldMap(GrassField worldMap) {
+    public void setWorldMap(AbstractWorldMap worldMap) {
         this.worldMap = worldMap;
     }
     private void clearGrid() {
@@ -301,7 +298,7 @@ public class SimulationPresenter implements MapChangeListener {
 
     private int simulationDay= -1;
     @Override
-    public void mapChanged(GrassField worldMap) {
+    public void mapChanged(AbstractWorldMap worldMap) {
         Platform.runLater(() -> {
             drawMap();
             if(statistics.getDay() != simulationDay){
@@ -331,7 +328,12 @@ public class SimulationPresenter implements MapChangeListener {
             if (width <= 0 || height <= 0 || grassQuantity < 0 || startEnergy < 0) {
 
             } else {
-                GrassField map = new GrassField(grassQuantity, width, height, isSpecial, isSpecialGen);
+                AbstractWorldMap map;
+                if(isSpecial){
+                    map = new PoisonGrassField(grassQuantity, width, height, isSpecialGen);
+                }else{
+                    map = new GrassField(grassQuantity, width, height, isSpecialGen);
+                }
                 map.subscribe(this);
                 setWorldMap(map);
 
@@ -354,6 +356,7 @@ public class SimulationPresenter implements MapChangeListener {
         if (simulationEngine != null) {
             simulationEngine.stopAllSimulations();
             dominantButton.setVisible(true);
+            trackButton.setVisible(true);
         }
     }
 
@@ -361,6 +364,7 @@ public class SimulationPresenter implements MapChangeListener {
         if (simulationEngine != null) {
             simulationEngine.resumeAllSimulations();
             dominantButton.setVisible(false);
+            trackButton.setVisible(false);
         }
     }
 
@@ -557,7 +561,11 @@ public class SimulationPresenter implements MapChangeListener {
         this.dominantButton = dominantButton;
     }
 
-    public void ontrackAnimalButton() {
+    public void setTrackButton(Button trackButton) {
+        this.trackButton = trackButton;
+    }
+
+    public void onTrackAnimalButton() {
         List<Animal> animals = statistics.getDeadAndAliveAnimals();
 
         List<String> choices = animals.stream()

@@ -12,7 +12,7 @@ public class Simulation implements Runnable{
 
     private List<Animal> deadAnimals = new ArrayList<>();
 
-    private GrassField map;
+    private AbstractWorldMap map;
 
     private final int energyCost;
 
@@ -41,7 +41,7 @@ public class Simulation implements Runnable{
     private volatile boolean isPaused = false; // Flaga do zatrzymywania/wznawiania symulacji
 
 
-    public Simulation(List<Vector2d> initialPositions, GrassField map, int genNumber, int startEnergy, int energyCost, int plantPerDay, int plantEnergy, int reproduceEnergyRequired, int reproduceEnergyLost, int minMutations, int maxMutations, Boolean isSpecialGen){
+    public Simulation(List<Vector2d> initialPositions, AbstractWorldMap map, int genNumber, int startEnergy, int energyCost, int plantPerDay, int plantEnergy, int reproduceEnergyRequired, int reproduceEnergyLost, int minMutations, int maxMutations, Boolean isSpecialGen){
         this.plantEnergy = plantEnergy;
         this.energyCost = energyCost;
         this.plantPerDay = plantPerDay;

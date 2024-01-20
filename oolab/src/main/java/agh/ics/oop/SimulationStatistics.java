@@ -1,5 +1,6 @@
 package agh.ics.oop;
 
+import agh.ics.oop.model.AbstractWorldMap;
 import agh.ics.oop.model.Animal;
 import agh.ics.oop.model.GrassField;
 
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SimulationStatistics {
-    private final GrassField grassField; // Referencja do obiektu GrassField
+    private final AbstractWorldMap grassField; // Referencja do obiektu GrassField
 
     private final Simulation simulation;
 
@@ -19,7 +20,7 @@ public class SimulationStatistics {
 
     public Animal selectedAnimal = null;
 
-    public SimulationStatistics(GrassField grassField, Simulation simulation) {
+    public SimulationStatistics(AbstractWorldMap grassField, Simulation simulation) {
         this.grassField = grassField;
         this.simulation = simulation;
     }

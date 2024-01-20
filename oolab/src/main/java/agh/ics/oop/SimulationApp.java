@@ -69,7 +69,9 @@ public class SimulationApp extends Application {
         dominantButton.setOnAction(e -> controller.onFollowSimulation());
 
         Button trackAnimalButton = new Button("Track Animal");
-        trackAnimalButton.setOnAction(e -> controller.ontrackAnimalButton());
+        trackAnimalButton.setVisible(false);
+        controller.setTrackButton(trackAnimalButton);
+        trackAnimalButton.setOnAction(e -> controller.onTrackAnimalButton());
 
         HBox buttonContainer = new HBox(pauseButton, resetButton, dominantButton, trackAnimalButton);
         buttonContainer.setSpacing(10); // Odstęp między przyciskami

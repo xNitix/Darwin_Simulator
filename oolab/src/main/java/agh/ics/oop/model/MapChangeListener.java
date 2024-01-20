@@ -1,6 +1,6 @@
 package agh.ics.oop.model;
 
 public interface MapChangeListener {
-    void mapChanged(GrassField worldMap);
+    void mapChanged(AbstractWorldMap worldMap);
 
 }

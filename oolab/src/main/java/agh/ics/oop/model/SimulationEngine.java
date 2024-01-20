@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 public class SimulationEngine {
     private final List<Simulation> simulations = new ArrayList<>();
     private final List<Thread> threads = new ArrayList<>();
-
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
     public SimulationEngine() {
 
