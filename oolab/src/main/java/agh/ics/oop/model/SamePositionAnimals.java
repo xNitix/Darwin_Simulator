@@ -5,14 +5,6 @@ import java.util.*;
 public class SamePositionAnimals implements WorldElement {
     private final Vector2d position;
 
-    public synchronized List<Animal> getAnimals() {
-        return animals;
-    }
-
-    public int size(){
-        return animals.size();
-    }
-
     private final List<Animal> animals = Collections.synchronizedList(new ArrayList<>());
 
     public SamePositionAnimals(Vector2d position, Animal animal) {
@@ -22,8 +14,8 @@ public class SamePositionAnimals implements WorldElement {
 
     public synchronized void addAnimal(Animal animal){
         int flag = 0;
-        for(Animal animalc : animals){
-            if (animalc.equals(animal)) {
+        for(Animal currAnimal : animals){
+            if (currAnimal.equals(animal)) {
                 flag = 1;
                 break;
             }
@@ -31,7 +23,6 @@ public class SamePositionAnimals implements WorldElement {
         if(flag == 0){
             animals.add(animal);
         }
-
     }
 
     public synchronized void removeAnimal(Animal animalToRemove) {
@@ -42,22 +33,15 @@ public class SamePositionAnimals implements WorldElement {
         return animals.isEmpty();
     }
 
-    @Override
-    public Vector2d getPosition() {
-        return position;
-    }
-
     public synchronized ArrayList<Animal> findStrongestAnimals() {
         ArrayList<Animal> shuffledAnimals = new ArrayList<>(animals);
         Collections.shuffle(shuffledAnimals);
-
         shuffledAnimals.sort(
                 Comparator.<Animal>comparingInt(animal -> animal.getCurrentEnergy())
                         .thenComparingInt(animal -> animal.getDayAlive())
                         .thenComparingInt(animal -> animal.getChildNumber())
                         .reversed() // Odwrócenie kolejności dla energii, by była od największej
         );
-
         return shuffledAnimals;
     }
 
@@ -78,6 +62,19 @@ public class SamePositionAnimals implements WorldElement {
             return strongestAnimals.get(0);
         }
         return null;
+    }
+
+    @Override
+    public Vector2d getPosition() {
+        return position;
+    }
+
+    public synchronized List<Animal> getAnimals() {
+        return animals;
+    }
+
+    public int size(){
+        return animals.size();
     }
 
 }

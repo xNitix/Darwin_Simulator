@@ -6,13 +6,10 @@ import java.util.ArrayList;
 import java.util.*;
 
 public class Simulation implements Runnable{
-    public List<Animal> getDeadAnimals() {
-        return deadAnimals;
-    }
 
-    private List<Animal> deadAnimals = new ArrayList<>();
+    private final List<Animal> deadAnimals = new ArrayList<>();
 
-    private AbstractWorldMap map;
+    private final AbstractWorldMap map;
 
     private final int energyCost;
 
@@ -24,22 +21,15 @@ public class Simulation implements Runnable{
 
     private final int reproduceEnergyLost;
 
-    private int maxMutations;
-    private int minMutations;
+    private final int maxMutations;
 
-    private int genNumber;
+    private final int minMutations;
+
+    private final int genNumber;
 
     private int day=0;
 
-
-    public int getDay() {
-        return day;
-    }
-
-    private UUID simulationID = UUID.randomUUID();
-
     private volatile boolean isPaused = false; // Flaga do zatrzymywania/wznawiania symulacji
-
 
     public Simulation(List<Vector2d> initialPositions, AbstractWorldMap map, int genNumber, int startEnergy, int energyCost, int plantPerDay, int plantEnergy, int reproduceEnergyRequired, int reproduceEnergyLost, int minMutations, int maxMutations, Boolean isSpecialGen){
         this.plantEnergy = plantEnergy;
@@ -79,14 +69,12 @@ public class Simulation implements Runnable{
                 }
             }
         }
-
     }
 
     private synchronized void updateAnimals(){
         for(Animal animal : map.getAnimalsObj()){
             map.move(animal,-energyCost);
         }
-
     }
 
     private synchronized void eat(){
@@ -114,6 +102,14 @@ public class Simulation implements Runnable{
 
     private synchronized void animalsReproduce(){
         map.reproduce(genNumber,minMutations,maxMutations,reproduceEnergyLost,reproduceEnergyRequired);
+    }
+
+    public List<Animal> getDeadAnimals() {
+        return deadAnimals;
+    }
+
+    public int getDay() {
+        return day;
     }
 
 }

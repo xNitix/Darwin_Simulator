@@ -101,19 +101,4 @@ public class Animal implements WorldElement{
     public int getId() { return id; }
     public Vector2d getPosition() { return position; }
 
-
-    public String toString() {
-        return switch (this.currentOrientation)
-        {
-            case NORTH -> "^";
-            case NORTH_EAST -> "NE";
-            case EAST ->  ">";
-            case SOUTH_EAST -> "SE";
-            case SOUTH -> "v";
-            case SHOUT_WEST -> "SW";
-            case WEST -> "<";
-            case NORTH_WEST -> "NW";
-        };
-    }
-
 }

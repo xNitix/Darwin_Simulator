@@ -12,22 +12,6 @@ public enum MapDirection {
     WEST,
     NORTH_WEST;
 
-    public String toString()
-    {
-        return switch(this)
-        {
-            case NORTH_EAST -> "Polnocny wschod";
-            case EAST -> "Wschod";
-            case WEST -> "Zachod";
-            case SOUTH_EAST -> "Poludniowy wschod";
-            case SOUTH ->  "Poludnie";
-            case NORTH -> "Polnoc";
-            case SHOUT_WEST -> "Poludniowy zachod";
-            case NORTH_WEST -> "Polnocny zachod";
-        };
-
-    }
-
     public MapDirection next()
     {
         int nextOne = (this.ordinal() + 1) % values().length;
@@ -86,14 +70,13 @@ public enum MapDirection {
         };
     }
 
-    public MapDirection getReverse(int directionId){
-        return idToDirection((directionId+4) % 8);
-    }
-
     public static MapDirection randomDirection() {
         Random random = new Random();
         return values()[random.nextInt(values().length)];
     }
 
+    public MapDirection getReverse(int directionId){
+        return idToDirection((directionId+4) % 8);
+    }
 
 }

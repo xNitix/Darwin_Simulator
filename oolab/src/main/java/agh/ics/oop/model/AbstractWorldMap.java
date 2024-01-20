@@ -261,7 +261,7 @@ public abstract class AbstractWorldMap implements WorldMap {
         return new Boundary(leftDownGrass,rightUpGrass);
     }
 
-    public synchronized ArrayList<Animal> getAnimalsObj() {
+    public ArrayList<Animal> getAnimalsObj() {
         return animalsObj;
     }
 

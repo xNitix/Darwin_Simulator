@@ -2,41 +2,41 @@ package agh.ics.oop;
 import java.util.Properties;
 
 public class SimulationConfig {
-    private String title;
-    private String normalNextGenButton;
+    private final String title;
+    private final String normalNextGenButton;
 
-    private String madnessNextGenButton;
+    private final String madnessNextGenButton;
 
-    private String animalNumber;
+    private final String animalNumber;
 
-    private String genNumberField;
+    private final String genNumberField;
 
-    private String startEnergyField;
+    private final String startEnergyField;
 
-    private String moveEnergyCost;
+    private final String moveEnergyCost;
 
-    private String reproduceEnergyField;
+    private final String reproduceEnergyField;
 
-    private String reproduceEnergyLostField;
+    private final String reproduceEnergyLostField;
 
-    private String minMutationsField;
+    private final String minMutationsField;
 
-    private String maxMutationsField;
+    private final String maxMutationsField;
 
-    private String forestedEquatorRadioButton;
+    private final String forestedEquatorRadioButton;
 
-    private String poisonedFruitRadioButton;
-    private String widthField;
+    private final String poisonedFruitRadioButton;
+    private final String widthField;
 
-    private String heightField;
+    private final String heightField;
 
-    private String grassQuantityField;
+    private final String grassQuantityField;
 
-    private String energyEatField;
+    private final String energyEatField;
 
-    private String plantPerDayField;
+    private final String plantPerDayField;
 
-    private String statisticCSVButton;
+    private final String statisticCSVButton;
 
     public SimulationConfig(Properties properties) {
         this.title = properties.getProperty("title");
@@ -100,9 +100,7 @@ public class SimulationConfig {
         return minMutationsField;
     }
 
-    public String getMaxMutationsField() {
-        return maxMutationsField;
-    }
+    public String getMaxMutationsField() {return maxMutationsField;}
 
     public String getForestedEquatorRadioButton() {
         return forestedEquatorRadioButton;

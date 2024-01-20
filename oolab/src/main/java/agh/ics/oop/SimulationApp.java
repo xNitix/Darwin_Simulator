@@ -19,6 +19,7 @@ public class SimulationApp extends Application {
     private BorderPane viewRoot;
     private FXMLLoader loader;
     private int simulationNumber = 0;
+
     public void start(Stage primaryStage) {
         configureStage(primaryStage);
         primaryStage.show();
@@ -45,7 +46,6 @@ public class SimulationApp extends Application {
         Label liveAnimalsAvgEnergyLabel = new Label();
         Label deadAniamlsDaysAlivedLabel = new Label();
         Label liveAnimalsChildAvgLabel = new Label();
-
         LineChart<Number, Number> lineChart = new LineChart<>(new NumberAxis(), new NumberAxis());
 
         controller.setLineChart(lineChart);
@@ -74,7 +74,7 @@ public class SimulationApp extends Application {
         trackAnimalButton.setOnAction(e -> controller.onTrackAnimalButton());
 
         HBox buttonContainer = new HBox(pauseButton, resetButton, dominantButton, trackAnimalButton);
-        buttonContainer.setSpacing(10); // Odstęp między przyciskami
+        buttonContainer.setSpacing(10);
 
         VBox legendContainer = new VBox();
         controller.setLegendContainer(legendContainer);
@@ -94,10 +94,8 @@ public class SimulationApp extends Application {
         leftContent.setSpacing(2);
 
         simulationTab.setContent(simulationContent);
-
         tabPane.getTabs().add(simulationTab);
         tabPane.getSelectionModel().select(simulationTab);
-
         controller.onSimulationStartClicked();
     }
 
@@ -105,21 +103,20 @@ public class SimulationApp extends Application {
 
     private void configureStage(Stage primaryStage) {
         if (viewRoot == null) {
-                refreshParamtersTab();
+                refreshParametersTab();
                 TabPane tabPane = new TabPane();
                 Tab parametersTab = new Tab("Parameters");
                 VBox parametersContent = new VBox(2);
-
                 parametersContent.getChildren().add(viewRoot);
-
                 Button startButton = new Button("Start New Simulation");
                 startButton.setMaxWidth(200);
                 HBox buttonContainer = new HBox();
                 buttonContainer.getChildren().add(startButton);
                 buttonContainer.setAlignment(Pos.CENTER);
+
                 startButton.setOnAction(event -> {
                     startNewSimulation(tabPane);
-                    refreshParamtersTab();
+                    refreshParametersTab();
                     parametersContent.getChildren().clear();
                     parametersContent.getChildren().add(viewRoot);
                     parametersContent.getChildren().addAll(new Label(), buttonContainer);
@@ -132,15 +129,13 @@ public class SimulationApp extends Application {
                 tabPane.getTabs().add(parametersTab);
                 Scene scene = new Scene(new BorderPane(tabPane), 200, 700);
                 primaryStage.setScene(scene);
-
         }
-
         primaryStage.setTitle("Simulation App");
         primaryStage.minWidthProperty().bind(viewRoot.minWidthProperty());
         primaryStage.minHeightProperty().bind(viewRoot.minHeightProperty());
     }
 
-    private void refreshParamtersTab(){
+    private void refreshParametersTab(){
         try{
             loader = new FXMLLoader(getClass().getClassLoader().getResource("simulation.fxml"));
             viewRoot = loader.load();

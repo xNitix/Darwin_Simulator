@@ -63,6 +63,38 @@ public class SimulationPresenter implements MapChangeListener {
     @FXML
     private TextField genNumberField;
 
+    Image blackCat = new Image("file:oolab/src/main/resources/koty/kot1.png");
+    Image grayCat = new Image("file:oolab/src/main/resources/koty/kot2.png");
+    Image redCat = new Image("file:oolab/src/main/resources/koty/kot3.png");
+    Image orangeCat = new Image("file:oolab/src/main/resources/koty/kot4.png");
+    Image yellowCat = new Image("file:oolab/src/main/resources/koty/kot5.png");
+    Image goodPlant = new Image("file:oolab/src/main/resources/koty/grass1.png");
+    Image badPlant = new Image("file:oolab/src/main/resources/koty/grass2.png");
+    String folderPath = "oolab/src/main/resources/StatisticsCSV";
+    String filePath;
+
+    private GridPane mapGrid;
+
+    private VBox mapAndTrack;
+
+    private Label plantCountLabel;
+
+    private Label liveAnimalsChildAvgLabel;
+
+    private Label freeFieldCountLabel;
+
+    private Label mostFamounsGenoTypeLabel;
+
+    private Label liveAnimalsAvgEnergyLabel;
+
+    private Label animalCountLabel;
+
+    private Label daysAliveLabel;
+
+    private LineChart<Number, Number> lineChart;
+
+    private VBox legendContainer;
+
     private Button trackButton;
 
     public void setMapGrid(GridPane mapGrid) {
@@ -71,11 +103,7 @@ public class SimulationPresenter implements MapChangeListener {
         });
     }
 
-    @FXML
-    private GridPane mapGrid;
 
-    @FXML
-    private VBox mapAndTrack;
     private AbstractWorldMap worldMap;
     private int cellSize = 280;
     private int startEnergy;
@@ -100,79 +128,46 @@ public class SimulationPresenter implements MapChangeListener {
 
     private int genNumber;
 
-    Image blackCat = new Image("file:oolab/src/main/resources/koty/kot1.png");
-    Image grayCat = new Image("file:oolab/src/main/resources/koty/kot2.png");
-    Image redCat = new Image("file:oolab/src/main/resources/koty/kot3.png");
-    Image orangeCat = new Image("file:oolab/src/main/resources/koty/kot4.png");
-    Image yellowCat = new Image("file:oolab/src/main/resources/koty/kot5.png");
-    Image goodPlant = new Image("file:oolab/src/main/resources/koty/grass1.png");
-    Image badPlant = new Image("file:oolab/src/main/resources/koty/grass2.png");
-
-    String folderPath = "oolab/src/main/resources/StatisticsCSV";
-
-    String filePath;
-
     public void setPlantCountLabel(Label plantCountLabel) {
         this.plantCountLabel = plantCountLabel;
     }
 
-    @FXML
-    private Label plantCountLabel;
 
     public void setFreeFieldCountLabel(Label freeFieldCountLabel) {
         this.freeFieldCountLabel = freeFieldCountLabel;
     }
 
-    @FXML
-    private Label freeFieldCountLabel;
 
     public void setMostFamounsGenoTypeLabel(Label mostFamounsGenoTypeLabel) {
         this.mostFamounsGenoTypeLabel = mostFamounsGenoTypeLabel;
     }
 
-    @FXML
-    private Label mostFamounsGenoTypeLabel;
 
     public void setLiveAnimalsAvgEnergyLabel(Label liveAnimalsAvgEnergy) {
         this.liveAnimalsAvgEnergyLabel = liveAnimalsAvgEnergy;
     }
 
-    @FXML
-    private Label liveAnimalsAvgEnergyLabel;
 
     public void setLiveAnimalsChildAvgLabel(Label liveAnimalsChildAvg) {
         this.liveAnimalsChildAvgLabel = liveAnimalsChildAvg;
     }
 
-    @FXML
-    private Label liveAnimalsChildAvgLabel;
-
     public void setAnimalCountLabel(Label animalCountLabel) {
         this.animalCountLabel = animalCountLabel;
     }
-
-    @FXML
-    private Label animalCountLabel;
 
     public void setDeadAniamlsDaysAlivedLabel(Label daysAliveLabel) {
         this.daysAliveLabel = daysAliveLabel;
     }
 
-    @FXML
-    private Label daysAliveLabel;
     private SimulationStatistics statistics; // Referencja do obiektu SimulationStatistics
 
-    @FXML
-    private LineChart<Number, Number> lineChart;
     private Map<Integer, Integer> animalCountData = new HashMap<>();
     private Map<Integer, Integer> plantCountData = new HashMap<>();
 
     public void setLegendContainer(VBox legendContainer) {
         this.legendContainer = legendContainer;
     }
-
-    @FXML
-    private VBox legendContainer;
 
     private Button dominantButton;
 
@@ -230,39 +225,39 @@ public class SimulationPresenter implements MapChangeListener {
         }
         for (int y = numRows; y >= 0; y--) {
             for (int x = 0; x <= numCols; x++) {
-                Rectangle komorka = new Rectangle(cellSize, cellSize);
-                komorka.setStroke(Color.BLACK);
-                Vector2d aktualnaPozycja = new Vector2d(x + bounds.leftDown().getX(), y + bounds.leftDown().getY());
+                Rectangle mapCell = new Rectangle(cellSize, cellSize);
+                mapCell.setStroke(Color.BLACK);
+                Vector2d currentPosition = new Vector2d(x + bounds.leftDown().getX(), y + bounds.leftDown().getY());
 
                 if(trackPosition != null){
-                    if(aktualnaPozycja.equals(trackPosition)){
-                        komorka.setStroke(Color.RED);
-                        komorka.setStrokeWidth(3);
+                    if(currentPosition.equals(trackPosition)){
+                        mapCell.setStroke(Color.RED);
+                        mapCell.setStrokeWidth(3);
                     }
                 }
 
-                FieldType fieldType = worldMap.getFieldType(aktualnaPozycja);
+                FieldType fieldType = worldMap.getFieldType(currentPosition);
                 if(fieldType == FieldType.PREFERRED){
-                    komorka.setFill(Color.GREEN);
-                    mapGrid.add(komorka, x, numRows - y);
+                    mapCell.setFill(Color.GREEN);
+                    mapGrid.add(mapCell, x, numRows - y);
                 } else {
-                    komorka.setFill(Color.rgb(215, 255, 190));
-                    mapGrid.add(komorka, x, numRows - y);
+                    mapCell.setFill(Color.rgb(215, 255, 190));
+                    mapGrid.add(mapCell, x, numRows - y);
                 }
 
-                Object obiekt = worldMap.objectAt(aktualnaPozycja);
-                if (obiekt instanceof Grass) {
+                Object object = worldMap.objectAt(currentPosition);
+                if (object instanceof Grass) {
                     ImageView imageView = new ImageView(goodPlant);
                     imageView.setFitWidth(cellSize);
                     imageView.setFitHeight(cellSize);
                     mapGrid.add(imageView, x, numRows - y);
-                } else if(obiekt instanceof BadGrass) {
+                } else if(object instanceof BadGrass) {
                     ImageView imageView = new ImageView(badPlant);
                     imageView.setFitWidth(cellSize);
                     imageView.setFitHeight(cellSize);
                     mapGrid.add(imageView, x, numRows - y);
-                } else if (obiekt instanceof Animal) {
-                    int energy = ((Animal) obiekt).getCurrentEnergy();
+                } else if (object instanceof Animal) {
+                    int energy = ((Animal) object).getCurrentEnergy();
                     if((double)energy/startEnergy*100 > 80){
                         ImageView imageView = new ImageView(blackCat);
                         imageView.setFitWidth(cellSize);
@@ -290,10 +285,9 @@ public class SimulationPresenter implements MapChangeListener {
                         mapGrid.add(imageView, x, numRows - y);
                     }
                 }
-                GridPane.setHalignment(komorka, HPos.CENTER);
+                GridPane.setHalignment(mapCell, HPos.CENTER);
             }
         }
-
     }
 
     private int simulationDay= -1;
@@ -323,7 +317,7 @@ public class SimulationPresenter implements MapChangeListener {
             minMutations = Integer.parseInt(minMutationsField.getText());
             maxMutations = Integer.parseInt(maxMutationsField.getText());
             genNumber = Integer.parseInt(genNumberField.getText());
-            cellSize=  (int) 430/Math.max(width,height);
+            cellSize = (int) 430/Math.max(width,height);
 
             if (width <= 0 || height <= 0 || grassQuantity < 0 || startEnergy < 0) {
 
