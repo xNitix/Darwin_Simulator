@@ -5,6 +5,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -43,8 +44,6 @@
                 <Label text="Maximum number of mutations"/>
                 <TextField fx:id="maxMutationsField" promptText="Enter Maximum number of mutations"/>
 
-                <Label fx:id="description"/>
-
             </VBox>
             <VBox spacing="8">
                 <Label text="Map Options" style="-fx-font-size: 15; -fx-font-weight: bold;"/>
@@ -68,6 +67,13 @@
 
                 <Label text="New plant per day"/>
                 <TextField fx:id="plantPerDayField" promptText="Enter how many plants should appear every day"/>
+
+                <RadioButton fx:id="statisticCSVButton" text="Save statistics to CSV" onAction="#onRadioButtonClickedCSV"/>
+
+                <Button text="Show Configurations" onAction="#showConfigurationsAlert"/>
+
+                <Button text="Save new configuration" onAction="#saveConfiguration"/>
+
             </VBox>
         </HBox>
     </center>

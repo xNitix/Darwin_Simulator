@@ -1,5 +1,6 @@
 package agh.ics.oop;
 
+import agh.ics.oop.model.AbstractWorldMap;
 import agh.ics.oop.model.Animal;
 import agh.ics.oop.model.GrassField;
 
@@ -9,17 +10,13 @@ import java.util.List;
 import java.util.Map;
 
 public class SimulationStatistics {
-    private final GrassField grassField; // Referencja do obiektu GrassField
+    private final AbstractWorldMap grassField;
 
     private final Simulation simulation;
 
-    public Animal getSelectedAnimal() {
-        return selectedAnimal;
-    }
-
     public Animal selectedAnimal = null;
 
-    public SimulationStatistics(GrassField grassField, Simulation simulation) {
+    public SimulationStatistics(AbstractWorldMap grassField, Simulation simulation) {
         this.grassField = grassField;
         this.simulation = simulation;
     }
@@ -41,23 +38,6 @@ public class SimulationStatistics {
         }
 
         return (double) avg /animalCounter;
-    }
-
-
-    public int getAnimalCount() {
-        return simulation.getAnimals().size();
-    }
-
-    public int getDay(){
-        return simulation.getDay();
-    }
-
-    public int getPlantsCount() {
-        return grassField.getGrassesObj().size();
-    }
-
-    public int getFreeFieldsCount() {
-        return grassField.freePosition().size();
     }
 
     public double getLiveAnimalsAvgEnergy(){
@@ -99,7 +79,6 @@ public class SimulationStatistics {
         List<Animal> animals = getDeadAndAliveAnimals();
         for(Animal animal : animals){
             if(Arrays.equals(animal.getGenoType(), dominantGenoType)){
-
                 result.add(animal);
             }
         }
@@ -108,16 +87,7 @@ public class SimulationStatistics {
 
     public List<Animal> getDeadAndAliveAnimals(){
         List<Animal> animals = new ArrayList<>(grassField.getAnimalsObj());
-
-        for (Animal deadAnimal : simulation.getDeadAnimals()) {
-            if (animals.contains(deadAnimal)) {
-                System.out.println(deadAnimal.getId() + " 2 ");
-            } else {
-                System.out.println(deadAnimal.getId() + " 1 ");
-                animals.add(deadAnimal);
-            }
-        }
-
+        animals.addAll(simulation.getDeadAnimals());
         return animals;
     }
 
@@ -129,7 +99,25 @@ public class SimulationStatistics {
                 return animal;
             }
         }
-
         return null;
     }
+
+    public Animal getSelectedAnimal() {
+        return selectedAnimal;
+    }
+
+    public int getDay(){ return simulation.getDay(); }
+
+    public int getAnimalCount() {
+        return simulation.getAnimals().size();
+    }
+
+    public int getPlantsCount() {
+        return grassField.getGrassesObj().size();
+    }
+
+    public int getFreeFieldsCount() {
+        return grassField.freePosition().size();
+    }
+
 }
