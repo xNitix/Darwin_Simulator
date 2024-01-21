@@ -2,7 +2,6 @@ package agh.ics.oop;
 import agh.ics.oop.presenter.SimulationPresenter;
 import agh.ics.oop.presenter.StatisticPresenter;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -72,7 +71,7 @@ public class SimulationApp extends Application {
         Button dominantButton = new Button("Dominant Genotype Animals");
         dominantButton.setVisible(false);
         controller.setDominantButton(dominantButton);
-        dominantButton.setOnAction(e -> controller.onFollowSimulation());
+        dominantButton.setOnAction(e -> controller.onDominantGenotype());
 
         Button trackAnimalButton = new Button("Track Animal");
         trackAnimalButton.setVisible(false);
@@ -127,7 +126,6 @@ public class SimulationApp extends Application {
                     parametersContent.getChildren().add(viewRoot);
                     parametersContent.getChildren().addAll(new Label(), buttonContainer);
                     simulationNumber ++;
-
                 });
 
                 parametersContent.getChildren().addAll(new Label(), buttonContainer);

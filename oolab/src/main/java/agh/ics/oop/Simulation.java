@@ -7,7 +7,7 @@ import java.util.*;
 
 public class Simulation implements Runnable{
 
-    private final List<Animal> deadAnimals = new ArrayList<>();
+    private final List<Animal> deadAnimals = Collections.synchronizedList(new ArrayList<>());
 
     private final AbstractWorldMap map;
 
@@ -63,21 +63,21 @@ public class Simulation implements Runnable{
                 day++;
                 map.updateDrawMap();
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(300);
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
             }
         }
     }
 
-    private synchronized void updateAnimals(){
+    private void updateAnimals(){
         for(Animal animal : map.getAnimalsObj()){
             map.move(animal,-energyCost);
         }
     }
 
-    private synchronized void eat(){
+    private void eat(){
         map.eatGrassByAnimals(plantEnergy);
     }
 
@@ -89,8 +89,8 @@ public class Simulation implements Runnable{
         isPaused = false;
     }
 
-    private synchronized void removeDeadAnimals() {
-        ArrayList<Animal> animals = new ArrayList<>(map.getAnimalsObj());
+    private void removeDeadAnimals() {
+        List<Animal> animals = Collections.synchronizedList(new ArrayList<>(map.getAnimalsObj()));
         for (Animal animal : animals) {
             if (animal.getCurrentEnergy() < 0) {
                 animal.setDeathDay(day);
@@ -100,7 +100,7 @@ public class Simulation implements Runnable{
         }
     }
 
-    private synchronized void animalsReproduce(){
+    private void animalsReproduce(){
         map.reproduce(genNumber,minMutations,maxMutations,reproduceEnergyLost,reproduceEnergyRequired);
     }
 

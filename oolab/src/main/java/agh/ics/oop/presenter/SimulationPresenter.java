@@ -413,7 +413,7 @@ public class SimulationPresenter implements MapChangeListener {
     }
 
     @FXML
-    public void onFollowSimulation() {
+    public void onDominantGenotype() {
         List<Animal> dominantGenotypeAnimals = statistics.findDominantGenotypeAnimals();
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Dominant Genotype Animals");

@@ -3,15 +3,15 @@ import java.util.*;
 import java.util.Queue;
 
 public abstract class AbstractWorldMap implements WorldMap {
-    protected final Map<Vector2d, FieldType> fieldTypes = new HashMap<>();
+    protected final Map<Vector2d, FieldType> fieldTypes = Collections.synchronizedMap(new HashMap<>());
 
     protected final Map<Vector2d, SamePositionAnimals> animals = Collections.synchronizedMap(new HashMap<>());
 
     protected final Map<Vector2d, WorldElement> grasses = Collections.synchronizedMap(new HashMap<>());
 
-    private final Map<int[],Integer> mapGenotypes = new HashMap<>();
+    private final Map<int[],Integer> mapGenotypes = Collections.synchronizedMap(new HashMap<>());
 
-    protected ArrayList<Animal> animalsObj = new ArrayList<>();
+    protected List<Animal> animalsObj = Collections.synchronizedList(new ArrayList<>());
 
     protected final List<WorldElement> grassesObj = Collections.synchronizedList(new ArrayList<>());
 
@@ -34,7 +34,7 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     abstract public void move(Animal animal, int energyCost);
 
-    public synchronized void addAnimalToMap(Animal animal, Vector2d position){
+    public void addAnimalToMap(Animal animal, Vector2d position){
         if(!animals.containsKey(position)){
             SamePositionAnimals samePositionAnimals = new SamePositionAnimals(position,animal);
             animals.put(position, samePositionAnimals);
@@ -43,7 +43,7 @@ public abstract class AbstractWorldMap implements WorldMap {
         }
     }
 
-    public synchronized void place(Animal animal) {
+    public void place(Animal animal) {
         addAnimalToMap(animal, animal.getPosition());
         animalsObj.add(animal);
         addGenotype(animal.getGenoType());
@@ -148,7 +148,7 @@ public abstract class AbstractWorldMap implements WorldMap {
             }
         }
     }
-    public synchronized void removeAnimalFromMap(Animal animalToRemove) {
+    public void removeAnimalFromMap(Animal animalToRemove) {
         Vector2d position = animalToRemove.getPosition();
         SamePositionAnimals samePositionAnimals = animals.get(position);
         if (samePositionAnimals != null) {
@@ -160,11 +160,11 @@ public abstract class AbstractWorldMap implements WorldMap {
         }
     }
 
-    public synchronized void removeDeadAnimalsFromList(Animal animalToRemove) {
+    public void removeDeadAnimalsFromList(Animal animalToRemove) {
         animalsObj.remove(animalToRemove);
     }
 
-    public synchronized void reproduce(int genNumber, int minMutations, int maxMutations, int reproduceCost, int energyRequired) {
+    public void reproduce(int genNumber, int minMutations, int maxMutations, int reproduceCost, int energyRequired) {
         List<Vector2d> animalsPositions = new ArrayList<>(animals.keySet());
 
         for (Vector2d position : animalsPositions) {
@@ -193,7 +193,7 @@ public abstract class AbstractWorldMap implements WorldMap {
         }
     }
 
-    private synchronized void descendantsUpdate(Animal child) {
+    private void descendantsUpdate(Animal child) {
         List<Animal> visitedAnimals = new ArrayList<>();
         Queue<Animal> queue = new LinkedList<>();
         queue.add(child.getParent1());
@@ -261,7 +261,7 @@ public abstract class AbstractWorldMap implements WorldMap {
         return new Boundary(leftDownGrass,rightUpGrass);
     }
 
-    public ArrayList<Animal> getAnimalsObj() {
+    public List<Animal> getAnimalsObj() {
         return animalsObj;
     }
 

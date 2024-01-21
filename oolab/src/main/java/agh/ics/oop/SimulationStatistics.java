@@ -21,12 +21,12 @@ public class SimulationStatistics {
         this.simulation = simulation;
     }
 
-    public synchronized int getNumberOfInsistingAnimals() {
-        ArrayList<Animal> animals = grassField.getAnimalsObj();
+    public int getNumberOfInsistingAnimals() {
+        List<Animal> animals = grassField.getAnimalsObj();
         return animals.size();
     }
 
-    public synchronized double getAvgDaysAlive() {
+    public double getAvgDaysAlive() {
         List<Animal> animals = simulation.getDeadAnimals();
         int avg = 0;
         int animalCounter = 0;
@@ -41,7 +41,7 @@ public class SimulationStatistics {
     }
 
     public double getLiveAnimalsAvgEnergy(){
-        ArrayList<Animal> animals = grassField.getAnimalsObj();
+        List<Animal> animals = grassField.getAnimalsObj();
         int sumEnergy = 0;
         for(Animal animal : animals){
             sumEnergy += animal.getCurrentEnergy();
@@ -50,7 +50,7 @@ public class SimulationStatistics {
     }
 
     public double getAliveAnimalsChildAvg(){
-        ArrayList<Animal> animals = grassField.getAnimalsObj();
+        List<Animal> animals = grassField.getAnimalsObj();
         int sumChild = 0;
         for(Animal animal : animals){
             sumChild += animal.getChildNumber();

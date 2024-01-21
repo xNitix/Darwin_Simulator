@@ -74,7 +74,7 @@ public class Animal implements WorldElement{
     public void animalReproduceEnergyLost(int energy){
         currentEnergy -= energy;
     }
-    public synchronized void animalNewChild(){
+    public void animalNewChild(){
         childNumber ++;
     }
     public void setDeathDay(int day){
@@ -82,7 +82,7 @@ public class Animal implements WorldElement{
             deathDay = day;
         }
     }
-    public synchronized void addNewDescendant(){
+    public void addNewDescendant(){
         descendantsNumber ++;
     }
     public void addSomeMadness() { randomFactor = 0.8; } // Ustawienie 80% szans na standardową aktywację, 20% szans na losowy gen (dodatek 3)

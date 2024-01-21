@@ -42,10 +42,6 @@ public class StatisticPresenter {
 
     private VBox mapAndTrack;
 
-    public void setCSVActive(boolean CSVActive) {
-        isCSVActive = CSVActive;
-    }
-
     private boolean isCSVActive;
 
     String folderPath = "oolab/src/main/resources/StatisticsCSV";
@@ -103,7 +99,7 @@ public class StatisticPresenter {
 
     }
 
-    public synchronized void updateSelectedAnimalStats(Animal selectedAnimal) {
+    public void updateSelectedAnimalStats(Animal selectedAnimal) {
         if (selectedAnimal != null) {
             VBox animalStatsBox = new VBox();
             animalStatsBox.setSpacing(2);
@@ -137,7 +133,6 @@ public class StatisticPresenter {
         String fileName = generateFileName();
         this.filePath = Paths.get(folderPath, fileName).toString();
         writeCSV(filePath, headers);
-        System.out.println("sss");
     }
 
     private static String generateFileName() {
@@ -149,15 +144,13 @@ public class StatisticPresenter {
     private static void writeCSV(String filePath, String[] headers) throws IOException {
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath)));
         writer.println(String.join(";", headers));
-
-
+        writer.flush();
     }
 
     private static void appendToCSV(String filePath, String[] data) throws IOException {
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath, true)));
         writer.println(String.join(";", data));
         writer.flush();
-        System.out.println("tu1");
     }
 
     public void setLineChart(LineChart<Number, Number> lineChart) {
@@ -221,5 +214,9 @@ public class StatisticPresenter {
 
     public void setStatistics(SimulationStatistics statistics) {
         this.statistics = statistics;
+    }
+
+    public void setCSVActive(boolean CSVActive) {
+        isCSVActive = CSVActive;
     }
 }

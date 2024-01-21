@@ -80,7 +80,7 @@ public class GrassField extends AbstractWorldMap{
         return Math.exp(-Math.pow(normalizedDistance, 2) / (2 * Math.pow(standardDeviation, 2)));
     }
 
-    public synchronized void move(Animal animal, int energyCost) {
+    public void move(Animal animal, int energyCost) {
         MapDirection newDirection= animal.getNewDirection();
         Vector2d oldPosition = animal.getPosition();
         Vector2d newPosition = super.generateNewPosition(oldPosition,newDirection);

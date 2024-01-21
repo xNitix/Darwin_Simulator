@@ -12,7 +12,7 @@ public class SamePositionAnimals implements WorldElement {
         animals.add(animal);
     }
 
-    public synchronized void addAnimal(Animal animal){
+    public void addAnimal(Animal animal){
         int flag = 0;
         for(Animal currAnimal : animals){
             if (currAnimal.equals(animal)) {
@@ -25,7 +25,7 @@ public class SamePositionAnimals implements WorldElement {
         }
     }
 
-    public synchronized void removeAnimal(Animal animalToRemove) {
+    public void removeAnimal(Animal animalToRemove) {
         animals.remove(animalToRemove);
     }
 
@@ -33,8 +33,8 @@ public class SamePositionAnimals implements WorldElement {
         return animals.isEmpty();
     }
 
-    public synchronized ArrayList<Animal> findStrongestAnimals() {
-        ArrayList<Animal> shuffledAnimals = new ArrayList<>(animals);
+    public List<Animal> findStrongestAnimals() {
+        List<Animal> shuffledAnimals = Collections.synchronizedList(new ArrayList<>(animals));
         Collections.shuffle(shuffledAnimals);
         shuffledAnimals.sort(
                 Comparator.<Animal>comparingInt(animal -> animal.getCurrentEnergy())
@@ -45,10 +45,10 @@ public class SamePositionAnimals implements WorldElement {
         return shuffledAnimals;
     }
 
-    public ArrayList<Animal> findTwoStrongestAnimals() {
-        ArrayList<Animal> result = new ArrayList<>();
+    public List<Animal> findTwoStrongestAnimals() {
+        List<Animal> result = Collections.synchronizedList(new ArrayList<>());
         if(!animals.isEmpty() && animals.size() > 1) {
-            ArrayList<Animal> strongestAnimals = findStrongestAnimals();
+            List<Animal> strongestAnimals = findStrongestAnimals();
             result.add(strongestAnimals.get(0));
             result.add(strongestAnimals.get(1));
             return result;
@@ -58,7 +58,7 @@ public class SamePositionAnimals implements WorldElement {
 
     public Animal getRandomStrongest(){
         if(!animals.isEmpty()) {
-            ArrayList<Animal> strongestAnimals = findStrongestAnimals();
+            List<Animal> strongestAnimals = findStrongestAnimals();
             return strongestAnimals.get(0);
         }
         return null;
@@ -69,7 +69,7 @@ public class SamePositionAnimals implements WorldElement {
         return position;
     }
 
-    public synchronized List<Animal> getAnimals() {
+    public List<Animal> getAnimals() {
         return animals;
     }
 
