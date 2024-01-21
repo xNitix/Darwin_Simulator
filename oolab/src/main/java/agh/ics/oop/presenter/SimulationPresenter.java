@@ -7,8 +7,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,7 +15,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import java.io.*;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -70,138 +67,174 @@ public class SimulationPresenter implements MapChangeListener {
     Image yellowCat = new Image("file:oolab/src/main/resources/koty/kot5.png");
     Image goodPlant = new Image("file:oolab/src/main/resources/koty/grass1.png");
     Image badPlant = new Image("file:oolab/src/main/resources/koty/grass2.png");
-    String folderPath = "oolab/src/main/resources/StatisticsCSV";
-    String filePath;
 
     private GridPane mapGrid;
 
-    private VBox mapAndTrack;
-
-    private Label plantCountLabel;
-
-    private Label liveAnimalsChildAvgLabel;
-
-    private Label freeFieldCountLabel;
-
-    private Label mostFamounsGenoTypeLabel;
-
-    private Label liveAnimalsAvgEnergyLabel;
-
-    private Label animalCountLabel;
-
-    private Label daysAliveLabel;
-
-    private LineChart<Number, Number> lineChart;
+    private Tab simulationTab;
 
     private VBox legendContainer;
 
     private Button trackButton;
 
-    public void setMapGrid(GridPane mapGrid) {
-        Platform.runLater(() -> {
-            this.mapGrid = mapGrid;
-        });
-    }
+    private Button dominantButton;
 
+    private int startEnergy;
+
+    private int startAnimalNumber;
+
+    private int cellSize = 280;
 
     private AbstractWorldMap worldMap;
-    private int cellSize = 280;
-    private int startEnergy;
-    private int moveCost;
-    private int startAnimalNumber;
-    private int energyForGrass;
-    private int plantPerDay;
-    private int reproduceEnergy;
-    private int reproduceEnergyLost;
-    private SimulationEngine simulationEngine = new SimulationEngine();
-    private int maxMutations;
-    private int minMutations;
 
-    private ToggleGroup radioGroup;
+    private final SimulationEngine simulationEngine = new SimulationEngine();
 
-    private ToggleGroup radioGroupGen;
+    private SimulationStatistics statistics;
+
+    private List<SimulationConfig> configurations;
+
+    private StatisticPresenter statisticPresenter;
 
     private Boolean isSpecial = false;
     private Boolean isSpecialGen = false;
-
     private Boolean isCSVActive = false;
 
-    private int genNumber;
+    public void initialize() {
+        statisticCSVButton.setSelected(false);
+        ToggleGroup radioGroup = new ToggleGroup();
+        poisonedFruitRadioButton.setToggleGroup(radioGroup);
+        forestedEquatorRadioButton.setToggleGroup(radioGroup);
+        forestedEquatorRadioButton.setSelected(true);
 
-    public void setPlantCountLabel(Label plantCountLabel) {
-        this.plantCountLabel = plantCountLabel;
+        radioGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            RadioButton selectedRadioButton = (RadioButton) newValue;
+            if (selectedRadioButton == poisonedFruitRadioButton) {
+                isSpecial = true;
+            } else if (selectedRadioButton == forestedEquatorRadioButton) {
+                isSpecial = false;
+            }
+        });
+
+        ToggleGroup radioGroupGen = new ToggleGroup();
+        normalNextGenButton.setToggleGroup(radioGroupGen);
+        madnessNextGenButton.setToggleGroup(radioGroupGen);
+        normalNextGenButton.setSelected(true);
+
+        radioGroupGen.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            RadioButton selectedRadioButton = (RadioButton) newValue;
+            if (selectedRadioButton == madnessNextGenButton) {
+                isSpecialGen = true;
+            } else if (selectedRadioButton == normalNextGenButton) {
+                isSpecialGen = false;
+            }
+        });
+
+        animalNumber.setText("3");
+        genNumberField.setText("3");
+        startEnergyField.setText("15");
+        widthField.setText("5");
+        heightField.setText("5");
+        grassQuantityField.setText("10");
+        energyEatField.setText("5");
+        moveEnergyCost.setText("1");
+        plantPerDayField.setText("2");
+        reproduceEnergyField.setText("5");
+        reproduceEnergyLostField.setText("4");
+        minMutationsField.setText("4");
+        maxMutationsField.setText("7");
     }
 
+    public void onSimulationStartClicked() {
+        try {
+            int width = Integer.parseInt(widthField.getText());
+            int height = Integer.parseInt(heightField.getText());
+            int grassQuantity = Integer.parseInt(grassQuantityField.getText());
+            startEnergy = Integer.parseInt(startEnergyField.getText());
+            int moveCost = Integer.parseInt(moveEnergyCost.getText());
+            startAnimalNumber = Integer.parseInt(animalNumber.getText());
+            int plantPerDay = Integer.parseInt(plantPerDayField.getText());
+            int energyForGrass = Integer.parseInt(energyEatField.getText());
+            int reproduceEnergy = Integer.parseInt(reproduceEnergyField.getText());
+            int reproduceEnergyLost = Integer.parseInt(reproduceEnergyLostField.getText());
+            int minMutations = Integer.parseInt(minMutationsField.getText());
+            int maxMutations = Integer.parseInt(maxMutationsField.getText());
+            int genNumber = Integer.parseInt(genNumberField.getText());
+            cellSize = (int) 430/Math.max(width,height);
 
-    public void setFreeFieldCountLabel(Label freeFieldCountLabel) {
-        this.freeFieldCountLabel = freeFieldCountLabel;
+            inputValidation(width,height,grassQuantity,startEnergy,moveCost,startAnimalNumber,plantPerDay,energyForGrass,reproduceEnergy,reproduceEnergyLost,minMutations,maxMutations,genNumber);
+
+            AbstractWorldMap map;
+            if(isSpecial){
+                map = new PoisonGrassField(grassQuantity, width, height, isSpecialGen);
+            }else{
+                map = new GrassField(grassQuantity, width, height, isSpecialGen);
+            }
+            map.subscribe(this);
+            setWorldMap(map);
+
+            List<Vector2d> positions = generateStartPositions();
+            Simulation simulation = new Simulation(positions, worldMap, genNumber, startEnergy, moveCost, plantPerDay, energyForGrass, reproduceEnergy, reproduceEnergyLost, minMutations, maxMutations, isSpecialGen);
+            statistics = new SimulationStatistics(map,simulation);
+            statisticPresenter.setStatistics(statistics);
+            statisticPresenter.setCSVActive(isCSVActive);
+            if(isCSVActive){
+                try {
+                    statisticPresenter.newFile();
+                } catch(IOException e){
+                    e.printStackTrace();
+                }
+            }
+            simulationEngine.addSimulation(simulation);
+            simulationTab.setOnClosed(event -> {
+                simulationEngine.shotDown();
+            });
+
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Arguments cannot be empty");
+        }
     }
 
+    private void inputValidation(int width,int height,int grassQuantity,int startEnergy,int moveCost,int startAnimalNumber,int plantPerDay,int energyForGrass,int reproduceEnergy,int reproduceEnergyLost,int minMutations,int maxMutations,int genNumber) {
+        if (width < 0 ) throw new IllegalArgumentException("Width must be grater than 0 ");
 
-    public void setMostFamounsGenoTypeLabel(Label mostFamounsGenoTypeLabel) {
-        this.mostFamounsGenoTypeLabel = mostFamounsGenoTypeLabel;
+        if (height < 0) throw new IllegalArgumentException("Height must be grater than 0");
+
+        if (grassQuantity < 0) throw new IllegalArgumentException("Start grassQuantity must be grater or equals than 0");
+
+        if (startEnergy < 0) throw new IllegalArgumentException("Start energy must be grater than 0");
+
+        if (moveCost < 0) throw new IllegalArgumentException("Move energy must be grater than 0");
+
+        if (startAnimalNumber < 0) throw new IllegalArgumentException("Animal number must be grater or equals than 0");
+
+        if (plantPerDay < 0) throw new IllegalArgumentException("Plant per day number must be grater or equals than 0");
+
+        if (energyForGrass < 0) throw new IllegalArgumentException("Energy from grass must be grater or equals than 0");
+
+        if (reproduceEnergy < 0) throw new IllegalArgumentException("Reproduce energy must be grater than or equals 0");
+
+        if (reproduceEnergyLost < 0) throw new IllegalArgumentException("Cost of reproduce must be grater than or equals 0");
+
+        if (minMutations < 0) throw new IllegalArgumentException("Minimum number of mutations must be greater than or equals 0");
+
+        if (maxMutations < 0) throw new IllegalArgumentException("Maximum number of mutations must be greater than or equals 0");
+
+        if (genNumber < 0) throw new IllegalArgumentException("Number of genes must be greater than or equals 0");
     }
 
-
-    public void setLiveAnimalsAvgEnergyLabel(Label liveAnimalsAvgEnergy) {
-        this.liveAnimalsAvgEnergyLabel = liveAnimalsAvgEnergy;
-    }
-
-
-    public void setLiveAnimalsChildAvgLabel(Label liveAnimalsChildAvg) {
-        this.liveAnimalsChildAvgLabel = liveAnimalsChildAvg;
-    }
-
-    public void setAnimalCountLabel(Label animalCountLabel) {
-        this.animalCountLabel = animalCountLabel;
-    }
-
-    public void setDeadAniamlsDaysAlivedLabel(Label daysAliveLabel) {
-        this.daysAliveLabel = daysAliveLabel;
-    }
-
-    private SimulationStatistics statistics; // Referencja do obiektu SimulationStatistics
-
-    private Map<Integer, Integer> animalCountData = new HashMap<>();
-    private Map<Integer, Integer> plantCountData = new HashMap<>();
-
-    public void setLegendContainer(VBox legendContainer) {
-        this.legendContainer = legendContainer;
-    }
-
-    private Button dominantButton;
-
-    public void setLineChart(LineChart<Number, Number> lineChart) {
-        this.lineChart = lineChart;
-
-        lineChart.setPrefWidth(400); //szerokość
-        lineChart.setPrefHeight(300); //wysokość
-
-        // Inicjalizacja serii danych dla ilości zwierząt
-        XYChart.Series<Number, Number> animalCountSeries = new XYChart.Series<>();
-        animalCountSeries.setName("Animal Count");
-
-        // Inicjalizacja serii danych dla ilości roslin
-        XYChart.Series<Number, Number> plantCountSeries = new XYChart.Series<>();
-        plantCountSeries.setName("Plant Count");
-
-        lineChart.getData().addAll(animalCountSeries, plantCountSeries);
-
-        lineChart.getXAxis().setLabel("Day");
-        lineChart.getYAxis().setLabel("Count");
-
-    }
-
-
-    public void setWorldMap(AbstractWorldMap worldMap) {
-        this.worldMap = worldMap;
-    }
     private void clearGrid() {
         mapGrid.setGridLinesVisible(false);
         mapGrid.getChildren().clear();
         mapGrid.setGridLinesVisible(true);
         mapGrid.getColumnConstraints().clear();
         mapGrid.getRowConstraints().clear();
+    }
+
+    @Override
+    public void mapChanged(AbstractWorldMap worldMap) {
+        Platform.runLater(() -> {
+            drawMap();
+            statisticPresenter.updateStatistics();
+        });
     }
 
     private void drawMap(){
@@ -244,7 +277,6 @@ public class SimulationPresenter implements MapChangeListener {
                     mapCell.setFill(Color.rgb(215, 255, 190));
                     mapGrid.add(mapCell, x, numRows - y);
                 }
-
                 Object object = worldMap.objectAt(currentPosition);
                 if (object instanceof Grass) {
                     ImageView imageView = new ImageView(goodPlant);
@@ -290,141 +322,6 @@ public class SimulationPresenter implements MapChangeListener {
         }
     }
 
-    private int simulationDay= -1;
-    @Override
-    public void mapChanged(AbstractWorldMap worldMap) {
-        Platform.runLater(() -> {
-            drawMap();
-            if(statistics.getDay() != simulationDay){
-                updateStatistics();
-                simulationDay = statistics.getDay();
-            }
-        });
-    }
-
-    public void onSimulationStartClicked() {
-        try {
-            int width = Integer.parseInt(widthField.getText());
-            int height = Integer.parseInt(heightField.getText());
-            int grassQuantity = Integer.parseInt(grassQuantityField.getText());
-            startEnergy = Integer.parseInt(startEnergyField.getText());
-            moveCost = Integer.parseInt(moveEnergyCost.getText());
-            startAnimalNumber = Integer.parseInt(animalNumber.getText());
-            plantPerDay = Integer.parseInt(plantPerDayField.getText());
-            energyForGrass = Integer.parseInt(energyEatField.getText());
-            reproduceEnergy = Integer.parseInt(reproduceEnergyField.getText());
-            reproduceEnergyLost = Integer.parseInt(reproduceEnergyLostField.getText());
-            minMutations = Integer.parseInt(minMutationsField.getText());
-            maxMutations = Integer.parseInt(maxMutationsField.getText());
-            genNumber = Integer.parseInt(genNumberField.getText());
-            cellSize = (int) 430/Math.max(width,height);
-
-            if (width <= 0 || height <= 0 || grassQuantity < 0 || startEnergy < 0) {
-
-            } else {
-                AbstractWorldMap map;
-                if(isSpecial){
-                    map = new PoisonGrassField(grassQuantity, width, height, isSpecialGen);
-                }else{
-                    map = new GrassField(grassQuantity, width, height, isSpecialGen);
-                }
-                map.subscribe(this);
-                setWorldMap(map);
-
-                List<Vector2d> positions = generateStartPositions();
-                Simulation simulation = new Simulation(positions, worldMap, genNumber, startEnergy, moveCost, plantPerDay, energyForGrass, reproduceEnergy, reproduceEnergyLost, minMutations, maxMutations, isSpecialGen);
-                statistics = new SimulationStatistics(map,simulation);
-
-                simulationEngine.addSimulation(simulation);
-
-            }
-            if(isCSVActive){
-                newFile();
-            }
-        } catch (NumberFormatException e) {
-            // tu tez
-        }
-    }
-
-    public void onPauseSimulation() {
-        if (simulationEngine != null) {
-            simulationEngine.stopAllSimulations();
-            dominantButton.setVisible(true);
-            trackButton.setVisible(true);
-        }
-    }
-
-    public void onResumeSimulation() {
-        if (simulationEngine != null) {
-            simulationEngine.resumeAllSimulations();
-            dominantButton.setVisible(false);
-            trackButton.setVisible(false);
-        }
-    }
-
-    public void initialize() {
-        statisticCSVButton.setSelected(false);
-        radioGroup = new ToggleGroup();
-        poisonedFruitRadioButton.setToggleGroup(radioGroup);
-        forestedEquatorRadioButton.setToggleGroup(radioGroup);
-        forestedEquatorRadioButton.setSelected(true);
-
-        radioGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
-            RadioButton selectedRadioButton = (RadioButton) newValue;
-            if (selectedRadioButton == poisonedFruitRadioButton) {
-                isSpecial = true;
-            } else if (selectedRadioButton == forestedEquatorRadioButton) {
-                isSpecial = false;
-            }
-        });
-
-        radioGroupGen = new ToggleGroup();
-        normalNextGenButton.setToggleGroup(radioGroupGen);
-        madnessNextGenButton.setToggleGroup(radioGroupGen);
-        normalNextGenButton.setSelected(true);
-
-        radioGroupGen.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
-            RadioButton selectedRadioButton = (RadioButton) newValue;
-            if (selectedRadioButton == madnessNextGenButton) {
-                isSpecialGen = true;
-            } else if (selectedRadioButton == normalNextGenButton) {
-                isSpecialGen = false;
-            }
-        });
-
-        animalNumber.setText("3");
-        genNumberField.setText("3");
-        startEnergyField.setText("15");
-        widthField.setText("5");
-        heightField.setText("5");
-        grassQuantityField.setText("10");
-        energyEatField.setText("5");
-        moveEnergyCost.setText("1");
-        plantPerDayField.setText("2");
-        reproduceEnergyField.setText("5");
-        reproduceEnergyLostField.setText("4");
-        minMutationsField.setText("4");
-        maxMutationsField.setText("7");
-    }
-
-    @FXML
-    private void onRadioButtonClicked() {
-        if (poisonedFruitRadioButton.isSelected()) {
-            isSpecial = true;
-        } else if (forestedEquatorRadioButton.isSelected()) {
-            isSpecial = false;
-        }
-    }
-
-    @FXML
-    private void onRadioButtonClickedGen() {
-        if (madnessNextGenButton.isSelected()) {
-            isSpecialGen = true;
-        } else if (normalNextGenButton.isSelected()) {
-            isSpecialGen = false;
-        }
-    }
-
     private List<Vector2d> generateStartPositions(){
         List<Vector2d> positions = new ArrayList<>();
         Random random = new Random();
@@ -438,54 +335,7 @@ public class SimulationPresenter implements MapChangeListener {
             int y = random.nextInt(height) + bounds.leftDown().getY();
             positions.add(new Vector2d(x, y));
         }
-
-
         return positions;
-
-    }
-
-    public void updateStatistics() {
-
-        int animalCount = statistics.getNumberOfInsistingAnimals();
-        double daysAlive = (double) Math.round(statistics.getAvgDaysAlive()* 100) /100;
-        int plantCount = statistics.getPlantsCount();
-        int freeFieldsCount = statistics.getFreeFieldsCount();
-        double liveAnimalsAvgEnergy = (double) Math.round(statistics.getLiveAnimalsAvgEnergy() * 100) /100;
-        double liveAnimalsChildAvg = (double) Math.round(statistics.getAliveAnimalsChildAvg()* 100)/100;
-        int[] mostFamousGenoType = statistics.getDominantGenoType();
-
-        animalCountLabel.setText("Animal Count: " + animalCount);
-        plantCountLabel.setText("Plant Count: " + plantCount);
-        freeFieldCountLabel.setText("Free Fields Count: " + freeFieldsCount);
-        mostFamounsGenoTypeLabel.setText("Famous Genotype: " + Arrays.toString(mostFamousGenoType));
-        liveAnimalsAvgEnergyLabel.setText("Alive Animals AVG Energy: " + liveAnimalsAvgEnergy);
-        daysAliveLabel.setText("Average Dead Animals Life Length: " + daysAlive);
-        liveAnimalsChildAvgLabel.setText("Alive Animals Child AVG: " + liveAnimalsChildAvg);
-        updateChart();
-        updateSelectedAnimalStats(statistics.getSelectedAnimal());
-        if(isCSVActive){
-            String[] row = {String.valueOf(statistics.getDay()), String.valueOf(animalCount), String.valueOf(plantCount), String.valueOf(freeFieldsCount),
-                    Arrays.toString(mostFamousGenoType), String.valueOf(liveAnimalsAvgEnergy), String.valueOf(daysAlive),String.valueOf(liveAnimalsChildAvg)};
-            appendToCSV(filePath,row);
-        }
-    }
-
-    public void updateChart() {
-        int animalCount = statistics.getAnimalCount();
-        int plantCount = statistics.getPlantsCount();
-        int days = statistics.getDay();
-
-        // Dodanie aktualnych danych do map
-        animalCountData.put(days, animalCount);
-        plantCountData.put(days, plantCount);
-
-        XYChart.Series<Number, Number> animalCountSeries = lineChart.getData().get(0);
-        XYChart.Series<Number, Number> plantCountSeries = lineChart.getData().get(1);
-
-        // Aktualizacja danych w istniejących seriach
-        animalCountSeries.getData().add(new XYChart.Data<>(days, animalCount));
-        plantCountSeries.getData().add(new XYChart.Data<>(days, plantCount));
-
     }
 
     public void createLegend() {
@@ -523,18 +373,53 @@ public class SimulationPresenter implements MapChangeListener {
             entryBox.setSpacing(5);
             legendContainer.getChildren().add(entryBox);
         }
+    }
 
+
+    public void onPauseSimulation() {
+        simulationEngine.stopSimulation();
+        dominantButton.setVisible(true);
+        trackButton.setVisible(true);
+    }
+
+    public void onResumeSimulation() {
+        simulationEngine.resumeSimulation();
+        dominantButton.setVisible(false);
+        trackButton.setVisible(false);
+    }
+
+    @FXML
+    private void onRadioButtonClicked() {
+        if (poisonedFruitRadioButton.isSelected()) {
+            isSpecial = true;
+        } else if (forestedEquatorRadioButton.isSelected()) {
+            isSpecial = false;
+        }
+    }
+
+    @FXML
+    private void onRadioButtonClickedGen() {
+        if (madnessNextGenButton.isSelected()) {
+            isSpecialGen = true;
+        } else if (normalNextGenButton.isSelected()) {
+            isSpecialGen = false;
+        }
+    }
+
+    public void onRadioButtonClickedCSV() {
+        if (statisticCSVButton.isSelected()) {
+            isCSVActive = true;
+        }
     }
 
     @FXML
     public void onFollowSimulation() {
         List<Animal> dominantGenotypeAnimals = statistics.findDominantGenotypeAnimals();
-
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Dominant Genotype Animals");
         alert.setHeaderText(null);
-
         VBox animalsInfo = new VBox();
+
         for (Animal animal : dominantGenotypeAnimals) {
             HBox animalDetails = new HBox();
 
@@ -543,20 +428,10 @@ public class SimulationPresenter implements MapChangeListener {
             Label energyLabel = new Label("  Energy: " + animal.getCurrentEnergy());
             Label isDeadLabel = new Label(animal.getCurrentEnergy() < 0 ? " (Dead)" : " (Alive)");
             animalDetails.getChildren().addAll(idLabel, positionLabel, energyLabel, isDeadLabel);
-
             animalsInfo.getChildren().add(animalDetails);
         }
-
         alert.getDialogPane().setContent(animalsInfo);
         alert.showAndWait();
-    }
-
-    public void setDominantButton(Button dominantButton) {
-        this.dominantButton = dominantButton;
-    }
-
-    public void setTrackButton(Button trackButton) {
-        this.trackButton = trackButton;
     }
 
     public void onTrackAnimalButton() {
@@ -577,84 +452,9 @@ public class SimulationPresenter implements MapChangeListener {
             int selectedAnimalID = Integer.parseInt(selectedAnimalInfo.split(":")[1].split(",")[0].trim()); // Pobranie ID wybranego zwierzęcia
 
             Animal selectedAnimal = statistics.findSelectedAnimal(selectedAnimalID);
-            updateSelectedAnimalStats(selectedAnimal);
-
+            statisticPresenter.updateSelectedAnimalStats(selectedAnimal);
         });
     }
-
-    public void setMapAndTrack(VBox mapAndTrack) {
-        this.mapAndTrack = mapAndTrack;
-    }
-
-    public synchronized void updateSelectedAnimalStats(Animal selectedAnimal) {
-        if (selectedAnimal != null) {
-            VBox animalStatsBox = new VBox();
-            animalStatsBox.setSpacing(2);
-            animalStatsBox.setStyle("-fx-background-color: white;-fx-border-color: black; -fx-border-width: 3px;-fx-padding: 3;");
-            Label animalInfoLabel = new Label("Selected Animal Info:");
-            animalInfoLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
-            Label idLabel = new Label("ID: " + selectedAnimal.getId());
-            idLabel.setStyle("-fx-font-weight: bold;");
-            Label positionLabel = new Label("Position: " + selectedAnimal.getPosition());
-            positionLabel.setStyle("-fx-font-weight: bold;");
-            Label genoType = new Label("Genotype: " + Arrays.toString(selectedAnimal.getGenoType()));
-            Label activeGen = new Label("Active gen: " + selectedAnimal.getGenoType()[selectedAnimal.getWhichGenIsActive()]);
-            Label energyLabel = new Label("Energy: " + selectedAnimal.getCurrentEnergy());
-            Label grassEatenCounter = new Label("Eaten grass counter: " + selectedAnimal.getGrassEatenCounter());
-            Label childCount = new Label("Child counter: " + selectedAnimal.getChildNumber());
-            Label lifeStatus = new Label();
-            if(selectedAnimal.getDeathDay() == -1){
-                lifeStatus.setText("Days Alive: " + selectedAnimal.getDayAlive());
-            } else {
-                lifeStatus.setText("Death day: " + selectedAnimal.getDeathDay());
-            }
-            Label descendants = new Label("Number of descendants: " + selectedAnimal.getDescendantsNumber());
-
-            animalStatsBox.getChildren().addAll(animalInfoLabel, idLabel, positionLabel, genoType, activeGen, energyLabel, grassEatenCounter, childCount, lifeStatus, descendants);
-
-            mapAndTrack.getChildren().clear();
-            mapAndTrack.getChildren().addAll(mapGrid, animalStatsBox);
-        }
-    }
-
-    public void onRadioButtonClickedCSV() {
-        if (statisticCSVButton.isSelected()) {
-            isCSVActive = true;
-        }
-    }
-
-    private void newFile(){
-        String[] headers = {"Day", "Animals Count", "Plants Count", "Free fields count", "Famous Genotype", "AVG energy for living animals", "AVG dead animals life length", "AVG child count"};
-        String fileName = generateFileName();
-        this.filePath = Paths.get(folderPath, fileName).toString();
-        writeCSV(filePath, headers);
-    }
-
-    private static String generateFileName() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        return "statistics_" + dateFormat.format(new Date()) + ".csv";
-    }
-
-    // Method to write CSV file with headers
-    private static void writeCSV(String filePath, String[] headers) {
-        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath)))) {
-            writer.println(String.join(";", headers));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Method to append data to an existing CSV file
-    private static void appendToCSV(String filePath, String[] data) {
-        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath, true)))) {
-            writer.println(String.join(";", data));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private List<SimulationConfig> configurations;
 
     public void showConfigurationsAlert(ActionEvent actionEvent) {
         loadConfigurationsFromProperties();
@@ -719,6 +519,7 @@ public class SimulationPresenter implements MapChangeListener {
 
         String newConfigFileName;
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+
         if (result.isEmpty()) {
             properties.setProperty("title", dateFormat.format(new Date() + ".properties"));
             newConfigFileName = dateFormat.format(new Date()) + ".properties";
@@ -750,6 +551,7 @@ public class SimulationPresenter implements MapChangeListener {
             properties.store(fileWriter, "New configuration");
 
         } catch (IOException e) {
+            System.out.println("anulowno");
             e.printStackTrace();
         }
     }
@@ -776,4 +578,27 @@ public class SimulationPresenter implements MapChangeListener {
         }
     }
 
+    public void setStatisticPresenter(StatisticPresenter statisticPresenter) { this.statisticPresenter = statisticPresenter;}
+
+    public void setSimulationTab(Tab simulationTab) {
+        this.simulationTab = simulationTab;
+    }
+
+    public void setMapGrid(GridPane mapGrid) {
+        Platform.runLater(() -> {
+            this.mapGrid = mapGrid;
+        });
+    }
+
+    public void setLegendContainer(VBox legendContainer) {
+        this.legendContainer = legendContainer;
+    }
+
+    public void setWorldMap(AbstractWorldMap worldMap) {
+        this.worldMap = worldMap;
+    }
+
+    public void setDominantButton(Button dominantButton) { this.dominantButton = dominantButton; }
+
+    public void setTrackButton(Button trackButton) { this.trackButton = trackButton; }
 }

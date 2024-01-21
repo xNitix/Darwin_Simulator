@@ -1,6 +1,8 @@
 package agh.ics.oop;
 import agh.ics.oop.presenter.SimulationPresenter;
+import agh.ics.oop.presenter.StatisticPresenter;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -28,6 +30,9 @@ public class SimulationApp extends Application {
     private void startNewSimulation(TabPane tabPane) {
         Tab simulationTab = new Tab("Simulation " + simulationNumber);
         SimulationPresenter controller = loader.getController();
+        StatisticPresenter statisticController = new StatisticPresenter();
+        controller.setStatisticPresenter(statisticController);
+        controller.setSimulationTab(simulationTab);
 
         HBox simulationContent = new HBox();
         simulationContent.setStyle("-fx-background-image: url('file:oolab/src/main/resources/koty/background.png'); -fx-padding: 5 0 10 30;");
@@ -38,6 +43,7 @@ public class SimulationApp extends Application {
         GridPane mapGrid = new GridPane();
         mapGrid.setStyle("-fx-background-color: white;-fx-border-color: black; -fx-border-width: 3px;");
         controller.setMapGrid(mapGrid);
+        statisticController.setMapGrid(mapGrid);
 
         Label animalCountLabel = new Label();
         Label plantCountLabel = new Label();
@@ -48,14 +54,14 @@ public class SimulationApp extends Application {
         Label liveAnimalsChildAvgLabel = new Label();
         LineChart<Number, Number> lineChart = new LineChart<>(new NumberAxis(), new NumberAxis());
 
-        controller.setLineChart(lineChart);
-        controller.setAnimalCountLabel(animalCountLabel);
-        controller.setDeadAniamlsDaysAlivedLabel(deadAniamlsDaysAlivedLabel);
-        controller.setPlantCountLabel(plantCountLabel);
-        controller.setFreeFieldCountLabel(freeFieldCountLabel);
-        controller.setMostFamounsGenoTypeLabel(mostFamounsGenoTypeLabel);
-        controller.setLiveAnimalsAvgEnergyLabel(liveAnimalsAvgEnergyLabel);
-        controller.setLiveAnimalsChildAvgLabel(liveAnimalsChildAvgLabel);
+        statisticController.setLineChart(lineChart);
+        statisticController.setAnimalCountLabel(animalCountLabel);
+        statisticController.setDeadAnimalsDaysAliveLabel(deadAniamlsDaysAlivedLabel);
+        statisticController.setPlantCountLabel(plantCountLabel);
+        statisticController.setFreeFieldCountLabel(freeFieldCountLabel);
+        statisticController.setMostFamousGenoTypeLabel(mostFamounsGenoTypeLabel);
+        statisticController.setLiveAnimalsAvgEnergyLabel(liveAnimalsAvgEnergyLabel);
+        statisticController.setLiveAnimalsChildAvgLabel(liveAnimalsChildAvgLabel);
 
         Button pauseButton = new Button("Pause");
         pauseButton.setOnAction(e -> controller.onPauseSimulation());
@@ -86,7 +92,7 @@ public class SimulationApp extends Application {
 
         VBox mapAndTrack = new VBox();
         mapAndTrack.getChildren().addAll(mapGrid);
-        controller.setMapAndTrack(mapAndTrack);
+        statisticController.setMapAndTrack(mapAndTrack);
 
         simulationContent.getChildren().addAll(leftContent, mapAndTrack);
 
@@ -129,10 +135,14 @@ public class SimulationApp extends Application {
                 tabPane.getTabs().add(parametersTab);
                 Scene scene = new Scene(new BorderPane(tabPane), 200, 700);
                 primaryStage.setScene(scene);
+
         }
         primaryStage.setTitle("Simulation App");
         primaryStage.minWidthProperty().bind(viewRoot.minWidthProperty());
         primaryStage.minHeightProperty().bind(viewRoot.minHeightProperty());
+        primaryStage.setOnCloseRequest(event -> {
+            System.exit(0);
+        });
     }
 
     private void refreshParametersTab(){

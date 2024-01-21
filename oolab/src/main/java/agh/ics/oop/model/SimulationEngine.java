@@ -15,13 +15,13 @@ public class SimulationEngine {
 
     }
 
-    public void stopAllSimulations() {
+    public void stopSimulation() {
         for (Simulation simulation : simulations) {
             simulation.stopSimulation();
         }
     }
 
-    public void resumeAllSimulations() {
+    public void resumeSimulation() {
         for (Simulation simulation : simulations) {
             simulation.resumeSimulation();
         }
@@ -30,6 +30,10 @@ public class SimulationEngine {
     public void addSimulation(Simulation simulation) {
         simulations.add(simulation);
         executorService.submit(simulation);
+    }
+
+    public void shotDown(){
+        executorService.shutdownNow();
     }
 
 

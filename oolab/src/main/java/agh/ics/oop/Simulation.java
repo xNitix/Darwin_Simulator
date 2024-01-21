@@ -63,7 +63,7 @@ public class Simulation implements Runnable{
                 day++;
                 map.updateDrawMap();
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
