@@ -1,5 +1,5 @@
 package agh.ics.oop.model;
-public enum MoveDirection
+public enum MoveDirection // używane?
 {
     FORWARD,
     BACKWARD,

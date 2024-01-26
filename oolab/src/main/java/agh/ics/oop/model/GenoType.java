@@ -2,7 +2,7 @@ package agh.ics.oop.model;
 
 import java.util.Random;
 
-public class GenoType {
+public class GenoType { // skoro mamy klasę Genotype, to czemu genotyp w zwierzęciu jest tablicą intów?
     private final static int TYPES_OF_GENES = 8;
     public static int[] createRandomGenoType(int genNumber){
         int[] genotype = new int[genNumber];
@@ -12,7 +12,7 @@ public class GenoType {
         return genotype;
     }
 
-    public static int[] combineGenoType(int genNumber, Animal animal1, Animal animal2, int minMutations, int maxMutations){
+    public static int[] combineGenoType(int genNumber, Animal animal1, Animal animal2, int minMutations, int maxMutations){ // czy ten geneNumber jest potrzebny?
 
         int[] childGenes = new int[genNumber];
         int totalEnergy = animal1.getCurrentEnergy() + animal2.getCurrentEnergy();

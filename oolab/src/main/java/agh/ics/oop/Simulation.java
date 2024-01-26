@@ -31,7 +31,7 @@ public class Simulation implements Runnable{
 
     private volatile boolean isPaused = false; // Flaga do zatrzymywania/wznawiania symulacji
 
-    public Simulation(List<Vector2d> initialPositions, AbstractWorldMap map, int genNumber, int startEnergy, int energyCost, int plantPerDay, int plantEnergy, int reproduceEnergyRequired, int reproduceEnergyLost, int minMutations, int maxMutations, Boolean isSpecialGen){
+    public Simulation(List<Vector2d> initialPositions, AbstractWorldMap map, int genNumber, int startEnergy, int energyCost, int plantPerDay, int plantEnergy, int reproduceEnergyRequired, int reproduceEnergyLost, int minMutations, int maxMutations, Boolean isSpecialGen){ // a nie mamy jakiejś klasy na trzymanie ustawień?
         this.plantEnergy = plantEnergy;
         this.energyCost = energyCost;
         this.plantPerDay = plantPerDay;

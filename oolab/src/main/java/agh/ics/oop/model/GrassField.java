@@ -36,7 +36,7 @@ public class GrassField extends AbstractWorldMap{
     }
 
     protected void initializeFieldTypes() {
-        Random random = new Random();
+        Random random = new Random(); // co wywołanie?
         double targetPreferredFieldsRatio = 0.2;
         int totalFields = (rightUpGrass.getX() - leftDownGrass.getX() + 1) * (rightUpGrass.getY() - leftDownGrass.getY() + 1);
         int targetPreferredFields = (int) (totalFields * targetPreferredFieldsRatio);
@@ -45,7 +45,7 @@ public class GrassField extends AbstractWorldMap{
 
         for (int x = leftDownGrass.getX(); x <= rightUpGrass.getX(); x++) {
             for (int y = leftDownGrass.getY(); y <= rightUpGrass.getY(); y++) {
-                if(random.nextDouble() < getPreferredProbability(y)){
+                if(random.nextDouble() < getPreferredProbability(y)){ // ?
                     preferredFields.add(new Vector2d(x,y));
                 }
             }

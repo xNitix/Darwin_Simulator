@@ -13,7 +13,7 @@ public class SamePositionAnimals implements WorldElement {
     }
 
     public void addAnimal(Animal animal){
-        int flag = 0;
+        int flag = 0; // czemu int i czemu flag?
         for(Animal currAnimal : animals){
             if (currAnimal.equals(animal)) {
                 flag = 1;

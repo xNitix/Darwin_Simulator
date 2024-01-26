@@ -290,32 +290,22 @@ public class SimulationPresenter implements MapChangeListener {
                     mapGrid.add(imageView, x, numRows - y);
                 } else if (object instanceof Animal) {
                     int energy = ((Animal) object).getCurrentEnergy();
+                    ImageView imageView;
                     if((double)energy/startEnergy*100 > 80){
-                        ImageView imageView = new ImageView(blackCat);
-                        imageView.setFitWidth(cellSize);
-                        imageView.setFitHeight(cellSize);
-                        mapGrid.add(imageView, x, numRows - y);
+                        imageView = new ImageView(blackCat);
+
                     }else if((double)energy/startEnergy*100 <= 80 && (double)energy/startEnergy*100 > 60){
-                        ImageView imageView = new ImageView(grayCat);
-                        imageView.setFitWidth(cellSize);
-                        imageView.setFitHeight(cellSize);
-                        mapGrid.add(imageView, x, numRows - y);
+                         imageView = new ImageView(grayCat);
                     }else if((double)energy/startEnergy*100 <= 60 && (double)energy/startEnergy*100 > 40){
-                        ImageView imageView = new ImageView(redCat);
-                        imageView.setFitWidth(cellSize);
-                        imageView.setFitHeight(cellSize);
-                        mapGrid.add(imageView, x, numRows - y);
+                         imageView = new ImageView(redCat);
                     }else if((double)energy/startEnergy*100 <= 40 && (double)energy/startEnergy*100 > 20){
-                        ImageView imageView = new ImageView(orangeCat);
-                        imageView.setFitWidth(cellSize);
-                        imageView.setFitHeight(cellSize);
-                        mapGrid.add(imageView, x, numRows - y);
-                    }else if((double)energy/startEnergy*100 <= 20){
-                        ImageView imageView = new ImageView(yellowCat);
-                        imageView.setFitWidth(cellSize);
-                        imageView.setFitHeight(cellSize);
-                        mapGrid.add(imageView, x, numRows - y);
+                         imageView = new ImageView(orangeCat);
+                    }else{
+                         imageView = new ImageView(yellowCat);
                     }
+                    imageView.setFitWidth(cellSize);
+                    imageView.setFitHeight(cellSize);
+                    mapGrid.add(imageView, x, numRows - y);
                 }
                 GridPane.setHalignment(mapCell, HPos.CENTER);
             }
@@ -601,4 +591,4 @@ public class SimulationPresenter implements MapChangeListener {
     public void setDominantButton(Button dominantButton) { this.dominantButton = dominantButton; }
 
     public void setTrackButton(Button trackButton) { this.trackButton = trackButton; }
-}
+} // dużo za duża klasa

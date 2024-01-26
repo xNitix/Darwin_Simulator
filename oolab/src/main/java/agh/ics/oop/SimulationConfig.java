@@ -1,7 +1,7 @@
 package agh.ics.oop;
 import java.util.Properties;
 
-public class SimulationConfig {
+public class SimulationConfig { // record?
     private final String title;
     private final String normalNextGenButton;
 

@@ -32,7 +32,7 @@ public class SimulationEngine {
         executorService.submit(simulation);
     }
 
-    public void shotDown(){
+    public void shotDown(){ // shut
         executorService.shutdownNow();
     }
 

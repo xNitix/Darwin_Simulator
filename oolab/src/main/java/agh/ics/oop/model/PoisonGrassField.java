@@ -56,7 +56,7 @@ public class PoisonGrassField extends AbstractWorldMap{
     }
 
     protected void initializeFieldTypes() {
-        Random random = new Random();
+        Random random = new Random(); // co wywołanie?
         double targetPreferredFieldsRatio = 0.2;
 
         int totalFields = (rightUpGrass.getX() - leftDownGrass.getX() + 1) * (rightUpGrass.getY() - leftDownGrass.getY() + 1);
@@ -117,7 +117,7 @@ public class PoisonGrassField extends AbstractWorldMap{
     }
 
     private boolean dashBadGrass() {
-        Random random = new Random();
+        Random random = new Random(); // co wywołanie?
         double chance = random.nextDouble();
         return chance < 0.2;
     }
