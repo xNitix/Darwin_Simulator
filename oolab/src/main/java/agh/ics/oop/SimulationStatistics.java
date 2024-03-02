@@ -14,7 +14,7 @@ public class SimulationStatistics {
 
     private final Simulation simulation;
 
-    public Animal selectedAnimal = null;
+    private Animal selectedAnimal = null;
 
     public SimulationStatistics(AbstractWorldMap grassField, Simulation simulation) {
         this.grassField = grassField;

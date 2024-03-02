@@ -2,28 +2,27 @@ package agh.ics.oop.model;
 import java.util.Random;
 
 public class Animal implements WorldElement{
-    private static int nextId = 0; // zmienna wspoldzielona (static)
+    private static int nextId = 0;
     private final int id;
     private final int[] genoType;
-    public int whichGenIsActive;
+    private int whichGenIsActive;
     private Vector2d position;
     private MapDirection currentOrientation;
     private int currentEnergy;
     private Animal parent1 = null;
     private Animal parent2 = null;
     private int dayAlive = 0;
-    public int grassEatenCounter = 0;
+    private int grassEatenCounter = 0;
     private int childNumber = 0;
     private int descendantsNumber = 0;
-    public int deathDay = -1;
-    private final Random random = new Random();
+    private int deathDay = -1;
+    private static final Random random = new Random();
     private double randomFactor = 1.0;
 
     public Animal(Vector2d position, int[] genoType, int currentEnergy, Boolean madness)
     {
         this.id = nextId;
         nextId++;
-        Random random = new Random();
         this.position = position;
         this.currentOrientation = MapDirection.NORTH;
         this.genoType = genoType;

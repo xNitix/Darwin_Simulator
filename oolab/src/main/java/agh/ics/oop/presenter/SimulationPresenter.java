@@ -461,7 +461,7 @@ public class SimulationPresenter implements MapChangeListener {
 
         List<String> configurationTitles = new ArrayList<>();
         for (SimulationConfig config : configurations) {
-            configurationTitles.add(config.getTitle());
+            configurationTitles.add(config.title());
         }
 
         ChoiceDialog<String> dialog = new ChoiceDialog<>(null, configurationTitles);
@@ -478,33 +478,33 @@ public class SimulationPresenter implements MapChangeListener {
 
     private SimulationConfig findConfigByTitle(String title) {
         return configurations.stream()
-                .filter(config -> config.getTitle().equals(title))
+                .filter(config -> config.title().equals(title))
                 .findFirst()
                 .orElse(null);
     }
 
     private void updateSelectedConfigStats(SimulationConfig selectedConfig) {
-        animalNumber.setText(selectedConfig.getAnimalNumber());
-        genNumberField.setText(selectedConfig.getGenNumberField());
-        startEnergyField.setText(selectedConfig.getStartEnergyField());
-        widthField.setText(selectedConfig.getWidthField());
-        heightField.setText(selectedConfig.getHeightField());
-        grassQuantityField.setText(selectedConfig.getGrassQuantityField());
-        energyEatField.setText(selectedConfig.getEnergyEatField());
-        moveEnergyCost.setText(selectedConfig.getMoveEnergyCost());
-        plantPerDayField.setText(selectedConfig.getPlantPerDayField());
-        reproduceEnergyField.setText(selectedConfig.getReproduceEnergyField());
-        reproduceEnergyLostField.setText(selectedConfig.getReproduceEnergyLostField());
-        minMutationsField.setText(selectedConfig.getMinMutationsField());
-        maxMutationsField.setText(selectedConfig.getMinMutationsField());
-        isSpecial = (Boolean.parseBoolean(selectedConfig.getPoisonedFruitRadioButton()));
-        isSpecialGen = (Boolean.parseBoolean(selectedConfig.getMadnessNextGenButton()));
-        forestedEquatorRadioButton.setSelected(Boolean.parseBoolean(selectedConfig.getForestedEquatorRadioButton()));
-        poisonedFruitRadioButton.setSelected(Boolean.parseBoolean(selectedConfig.getPoisonedFruitRadioButton()));
-        madnessNextGenButton.setSelected(Boolean.parseBoolean(selectedConfig.getMadnessNextGenButton()));
-        normalNextGenButton.setSelected(Boolean.parseBoolean(selectedConfig.getNormalNextGenButton()));
-        statisticCSVButton.setSelected(Boolean.parseBoolean(selectedConfig.getStatisticCSVButton()));
-        isCSVActive = Boolean.parseBoolean(selectedConfig.getStatisticCSVButton());
+        animalNumber.setText(selectedConfig.animalNumber());
+        genNumberField.setText(selectedConfig.genNumberField());
+        startEnergyField.setText(selectedConfig.startEnergyField());
+        widthField.setText(selectedConfig.widthField());
+        heightField.setText(selectedConfig.heightField());
+        grassQuantityField.setText(selectedConfig.grassQuantityField());
+        energyEatField.setText(selectedConfig.energyEatField());
+        moveEnergyCost.setText(selectedConfig.moveEnergyCost());
+        plantPerDayField.setText(selectedConfig.plantPerDayField());
+        reproduceEnergyField.setText(selectedConfig.reproduceEnergyField());
+        reproduceEnergyLostField.setText(selectedConfig.reproduceEnergyLostField());
+        minMutationsField.setText(selectedConfig.minMutationsField());
+        maxMutationsField.setText(selectedConfig.minMutationsField());
+        isSpecial = (Boolean.parseBoolean(selectedConfig.poisonedFruitRadioButton()));
+        isSpecialGen = (Boolean.parseBoolean(selectedConfig.madnessNextGenButton()));
+        forestedEquatorRadioButton.setSelected(Boolean.parseBoolean(selectedConfig.forestedEquatorRadioButton()));
+        poisonedFruitRadioButton.setSelected(Boolean.parseBoolean(selectedConfig.poisonedFruitRadioButton()));
+        madnessNextGenButton.setSelected(Boolean.parseBoolean(selectedConfig.madnessNextGenButton()));
+        normalNextGenButton.setSelected(Boolean.parseBoolean(selectedConfig.normalNextGenButton()));
+        statisticCSVButton.setSelected(Boolean.parseBoolean(selectedConfig.statisticCSVButton()));
+        isCSVActive = Boolean.parseBoolean(selectedConfig.statisticCSVButton());
     }
 
     public void saveConfiguration() {
