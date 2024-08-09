@@ -1,4 +1,10 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model.maps;
+import agh.ics.oop.model.entity.Animal;
+import agh.ics.oop.model.entity.WorldElement;
+import agh.ics.oop.model.enums.FieldType;
+import agh.ics.oop.model.enums.MapDirection;
+import agh.ics.oop.model.utils.*;
+
 import java.util.*;
 import java.util.Queue;
 

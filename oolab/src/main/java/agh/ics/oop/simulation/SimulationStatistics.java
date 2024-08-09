@@ -1,8 +1,7 @@
-package agh.ics.oop;
+package agh.ics.oop.simulation;
 
-import agh.ics.oop.model.AbstractWorldMap;
-import agh.ics.oop.model.Animal;
-import agh.ics.oop.model.GrassField;
+import agh.ics.oop.model.maps.AbstractWorldMap;
+import agh.ics.oop.model.entity.Animal;
 
 import java.util.ArrayList;
 import java.util.Arrays;

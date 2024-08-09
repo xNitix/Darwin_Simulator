@@ -1,6 +1,9 @@
-package agh.ics.oop;
+package agh.ics.oop.simulation;
 
-import agh.ics.oop.model.*;
+import agh.ics.oop.model.entity.Animal;
+import agh.ics.oop.model.maps.AbstractWorldMap;
+import agh.ics.oop.model.utils.GenoType;
+import agh.ics.oop.model.utils.Vector2d;
 
 import java.util.ArrayList;
 import java.util.*;

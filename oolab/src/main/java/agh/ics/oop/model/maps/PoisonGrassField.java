@@ -1,6 +1,14 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model.maps;
+import agh.ics.oop.model.utils.SamePositionAnimals;
+import agh.ics.oop.model.utils.Vector2d;
+import agh.ics.oop.model.entity.Animal;
+import agh.ics.oop.model.entity.BadGrass;
+import agh.ics.oop.model.entity.Grass;
+import agh.ics.oop.model.enums.FieldType;
+import agh.ics.oop.model.enums.MapDirection;
+
 import java.util.*;
-import static agh.ics.oop.model.MapDirection.randomDirection;
+import static agh.ics.oop.model.enums.MapDirection.randomDirection;
 public class PoisonGrassField extends AbstractWorldMap{
 
     public PoisonGrassField(int grassFilesQuantity, int width, int height, Boolean isSpecialGen) {

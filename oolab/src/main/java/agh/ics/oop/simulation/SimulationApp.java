@@ -1,4 +1,4 @@
-package agh.ics.oop;
+package agh.ics.oop.simulation;
 import agh.ics.oop.presenter.SimulationPresenter;
 import agh.ics.oop.presenter.StatisticPresenter;
 import javafx.application.Application;

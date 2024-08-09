@@ -1,4 +1,11 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model.maps;
+import agh.ics.oop.model.utils.SamePositionAnimals;
+import agh.ics.oop.model.utils.Vector2d;
+import agh.ics.oop.model.entity.Animal;
+import agh.ics.oop.model.entity.Grass;
+import agh.ics.oop.model.enums.FieldType;
+import agh.ics.oop.model.enums.MapDirection;
+
 import java.util.*;
 public class GrassField extends AbstractWorldMap{
 

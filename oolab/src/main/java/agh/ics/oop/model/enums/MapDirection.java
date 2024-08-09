@@ -1,4 +1,6 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model.enums;
+
+import agh.ics.oop.model.utils.Vector2d;
 
 import java.util.Random;
 

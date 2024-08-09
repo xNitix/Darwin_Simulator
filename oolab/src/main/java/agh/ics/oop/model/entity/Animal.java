@@ -1,7 +1,10 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model.entity;
+import agh.ics.oop.model.enums.MapDirection;
+import agh.ics.oop.model.utils.Vector2d;
+
 import java.util.Random;
 
-public class Animal implements WorldElement{
+public class Animal implements WorldElement {
     private static int nextId = 0;
     private final int id;
     private final int[] genoType;
@@ -39,7 +42,7 @@ public class Animal implements WorldElement{
         this.parent2 = parent2;
     }
 
-    protected MapDirection getNewDirection(){
+    public MapDirection getNewDirection(){
         int newDirectionId = (currentOrientation.directionToId() + genoType[whichGenIsActive % genoType.length])%8;
         currentOrientation = currentOrientation.idToDirection(newDirectionId);
         return currentOrientation;
@@ -99,5 +102,7 @@ public class Animal implements WorldElement{
     public int getDeathDay() { return deathDay; }
     public int getId() { return id; }
     public Vector2d getPosition() { return position; }
-
+    public MapDirection getCurrentOrientation() {
+        return currentOrientation;
+    }
 }

@@ -1,4 +1,7 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model.maps;
+
+import agh.ics.oop.model.utils.Boundary;
+import agh.ics.oop.model.entity.Animal;
 
 /**
  * The interface responsible for interacting with the map of the world.

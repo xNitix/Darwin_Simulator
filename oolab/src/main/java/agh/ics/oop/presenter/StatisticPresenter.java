@@ -1,7 +1,7 @@
 package agh.ics.oop.presenter;
 
-import agh.ics.oop.SimulationStatistics;
-import agh.ics.oop.model.Animal;
+import agh.ics.oop.simulation.SimulationStatistics;
+import agh.ics.oop.model.entity.Animal;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
